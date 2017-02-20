@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://java.sun.com/xml/ns/javaee"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+	id="WebApp_ID" version="2.5">
+	<display-name>My Notes Services</display-name>
+	<description>
+      My Notes Services
+    </description>
+	<welcome-file-list>
+		<welcome-file>notes_manager.html</welcome-file>
+	</welcome-file-list>
+	<context-param>
+		<description>the application res directory files</description>
+		<param-name>localAppDir</param-name>
+		<param-value>res</param-value>
+	</context-param>
+
+
+	<servlet>
+		<description></description>
+		<display-name>ProjectResourceServlet</display-name>
+		<servlet-name>ProjectResourceServlet</servlet-name>
+		<servlet-class>com.haifa.servlets.ProjectResourceServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>ProjectResourceServlet</servlet-name>
+		<url-pattern>/projres</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<description></description>
+		<display-name>WebFoldersManageServlet</display-name>
+		<servlet-name>WebFoldersManageServlet</servlet-name>
+		<servlet-class>com.haifa.servlets.WebFoldersManageServlet</servlet-class>
+
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>WebFoldersManageServlet</servlet-name>
+		<url-pattern>/web_folder_manage</url-pattern>
+	</servlet-mapping>
+
+
+	<servlet>
+		<description></description>
+		<display-name>WebItemsManageServlet</display-name>
+		<servlet-name>WebItemsManageServlet</servlet-name>
+		<servlet-class>com.haifa.servlets.WebItemsManageServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>WebItemsManageServlet</servlet-name>
+		<url-pattern>/web_item_manage</url-pattern>
+	</servlet-mapping>
+
+</web-app>
