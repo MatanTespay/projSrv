@@ -86,12 +86,12 @@ public class Organization {
 		//String email, String password, byte[] profilePic)
 
 		JSONObject iObj = new JSONObject();
-		iObj.put("id", getId());
+		iObj.put("organizationID", getId());
 		iObj.put("organizationName", getName());
 		iObj.put("Address", getAddress());
 		iObj.put("Email", getEmail());
 		iObj.put("Password", getPassword());
-		iObj.put("ProfilePic",  (isImageExists() ?  FilesUtils.blobToBase64String(getProfilePic()) : null ) );
+		iObj.put("ProfilePic",  (isImageExists() ?  FilesUtils.blobToBase64String(getProfilePic()) : "" ) );
 		return iObj;
 	}
 /**

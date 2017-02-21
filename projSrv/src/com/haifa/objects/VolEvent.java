@@ -106,12 +106,13 @@ public class VolEvent {
     		//String email, String password, byte[] profilePic)
 
     		JSONObject iObj = new JSONObject();
-    		iObj.put("orgID", getOrgID());
-    		iObj.put("volID", getVolID());
+    		iObj.put("eventID", getVolEventID());
+    		iObj.put("volunteerID", getVolID());
+    		iObj.put("organizationID", getOrgID());
+    		iObj.put("date", (getDate()==null? "":getDate()));
+    		iObj.put("startTime", (getStartTime()==null? "":getStartTime()));
+    		iObj.put("endTime",  (getEndTime()==null? "":getEndTime()));
     		iObj.put("details", getDetails());
-    		iObj.put("date", getDate());
-    		iObj.put("startTime", getStartTime());
-    		iObj.put("endTime", getEndTime());
     		iObj.put("title", getTitle());
     		return iObj;
     	}

@@ -21,9 +21,13 @@ import javax.servlet.http.HttpServletResponse;
 import com.haifa.database.operations.ConnPool;
 import com.haifa.database.operations.FoldersResProvider;
 import com.haifa.database.operations.ItemsResProvider;
+import com.haifa.database.operations.OrganizationResProvider;
+import com.haifa.database.operations.VolEventResProvider;
 import com.haifa.database.operations.VolunteerResProvider;
 import com.haifa.objects.Folder;
 import com.haifa.objects.Item;
+import com.haifa.objects.Organization;
+import com.haifa.objects.VolEvent;
 import com.haifa.objects.Volunteer;
 import com.haifa.utils.FilesUtils;
 
@@ -321,6 +325,49 @@ public class ProjectResourceServlet extends HttpServlet {
 						VolunteerResProvider v_provider = new VolunteerResProvider();
 						List<Volunteer> v_list = v_provider.getAllVolunteers(conn);
 						String resultJson = Volunteer.toJson(v_list);
+
+						if (resultJson != null && !resultJson.isEmpty()) {
+							respPage = resultJson;
+							resp.addHeader("Content-Type",
+									"application/json; charset=UTF-8");
+							PrintWriter pw = resp.getWriter();
+							pw.write(respPage);
+						} else {
+							resp.sendError(404);
+						}
+						
+
+						retry = 0;
+						break;
+					}
+					
+					case GET_VOLEVENTS_REQ: {
+						
+						conn = ConnPool.getInstance().getConnection();
+						VolEventResProvider v_provider = new VolEventResProvider();
+						List<VolEvent> v_list = v_provider.getAllVolEvent(conn);
+						String resultJson = VolEvent.toJson(v_list);
+
+						if (resultJson != null && !resultJson.isEmpty()) {
+							respPage = resultJson;
+							resp.addHeader("Content-Type",
+									"application/json; charset=UTF-8");
+							PrintWriter pw = resp.getWriter();
+							pw.write(respPage);
+						} else {
+							resp.sendError(404);
+						}
+						
+
+						retry = 0;
+						break;
+					}
+					case GET_ORGANIZATIONS_REQ: {
+						
+						conn = ConnPool.getInstance().getConnection();
+						OrganizationResProvider v_provider = new OrganizationResProvider();
+						List<Organization> v_list = v_provider.getAllOrganizations(conn);
+						String resultJson = Organization.toJson(v_list);
 
 						if (resultJson != null && !resultJson.isEmpty()) {
 							respPage = resultJson;

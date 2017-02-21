@@ -17,18 +17,18 @@ import com.haifa.objects.Volunteer;
 public class OrganizationResProvider {
 
 	// update organization query
-	private static final String update_sql = "UPDATE  organization  SET  organizationID  = ?,  organizationName  = ?,  address  = ?,  email  = ?,  password  ?,  orgPic  = ? WHERE  organizationID  = ?;";
+	private static final String update_sql = "UPDATE  organization  SET   organizationName  = ?,  address  = ?,  email  = ?,  password  ?,  orgPic  = ? WHERE  organizationID  = ?;";
 	// select organization by chosen org query 
 	private static final String select_sql = "SELECT * FROM  organization WHERE organizationID = ?;";
 	// select  all organizations query
 	private static final String selectAll_sql = "SELECT * FROM  organization;";
 	// insert org query
-	private static final String insert_sql = "INSERT INTO  organization  ( organizationID ,  organizationName , "
-			+ " address ,  email ,  password ,  orgPic ) VALUES (?, ?, ?,?, ?,?); ";
+	private static final String insert_sql = "INSERT INTO  organization  (  organizationName , "
+			+ " address ,  email ,  password ,  orgPic ) VALUES (?, ?, ?,?, ?); ";
 	// delete org query
 	private static final String delete_sql = "DELETE FROM organization WHERE organizationID = ? ;";
 	//select image
-	private static final String select_img_sql = "SELECT image FROM  organization WHERE organizationID = ?;";
+	private static final String select_img_sql = "SELECT orgPic FROM  organization WHERE organizationID = ?;";
 
 	// =========
 	//private static final String delete_all_sql = "DELETE FROM volunteer WHERE folder_id=?;"; // delete
@@ -148,18 +148,18 @@ public class OrganizationResProvider {
 				if (rs1.next()) {
 					// its execute update
 					ps = (PreparedStatement) conn.prepareStatement(update_sql);
-					ps.setInt(1, id);
-					ps.setString(2, name);
-					ps.setString(3, address);
-					ps.setString(4, email);
-					ps.setString(5, password);
+
+					ps.setString(1, name);
+					ps.setString(2, address);
+					ps.setString(3, email);
+					ps.setString(4, password);
 					if (profilePic != null) {
 						InputStream is = new ByteArrayInputStream(profilePic);
-						ps.setBlob(6, is);
+						ps.setBlob(5, is);
 
 					} else {
 
-						ps.setNull(8, Types.BLOB);
+						ps.setNull(5, Types.BLOB);
 					}
 					
 					
@@ -168,18 +168,18 @@ public class OrganizationResProvider {
 
 					// its execute insert
 					ps = (PreparedStatement) conn.prepareStatement(insert_sql);
-					ps.setInt(1, id);
-					ps.setString(2, name);
-					ps.setString(3, address);
-					ps.setString(4, email);
-					ps.setString(5, password);
+				
+					ps.setString(1, name);
+					ps.setString(2, address);
+					ps.setString(3, email);
+					ps.setString(4, password);
 					if (profilePic != null) {
 						InputStream is = new ByteArrayInputStream(profilePic);
-						ps.setBlob(6, is);
+						ps.setBlob(5, is);
 
 					} else {
 
-						ps.setNull(8, Types.BLOB);
+						ps.setNull(5, Types.BLOB);
 					}
 					result = ps.execute();
 					//result = true;

@@ -17,14 +17,14 @@ import com.haifa.utils.FilesUtils;
 
 public class VolEventResProvider {
 
-	private static final String update_sql = "UPDATE  volevent  SET  eventID  = >,  volunteerID  ="
-			+ " ?,  organizationID  = ?,  date  = ?,  startTime  = ?,  endTime  = ?,  details  = ?,  title  = ? WHERE  eventID  = ?; ";
+	private static final String update_sql = "UPDATE  volevent  SET    volunteerID  =? "
+			+ " ,  organizationID  = ?,  date  = ?,  startTime  = ?,  endTime  = ?,  details  = ?,  title  = ? WHERE  eventID  = ?; ";
 
 	private static final String select_sql = "SELECT * FROM  volevent WHERE eventID = ?;";
 	
 	private static final String selectAll_sql = "SELECT * FROM  volevent;";
 
-	private static final String insert_sql = " INSERT INTO  volevent  ( eventID ,  volunteerID ,  organizationID ,  date ,  startTime ,  endTime ,  details ,  title ) VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
+	private static final String insert_sql = " INSERT INTO  volevent  (   volunteerID ,  organizationID ,  date ,  startTime ,  endTime ,  details ,  title ) VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
 
 	//private static final String select_img_sql = "SELECT image FROM  volunteer WHERE volunteerID = ?;";
 	
@@ -142,14 +142,15 @@ public class VolEventResProvider {
 				rs1 = stt.getResultSet();
 				if (rs1.next()) {
 					// its execute update
-			
+
+				
 					ps = (PreparedStatement) conn.prepareStatement(update_sql);
-					ps.setInt(2, volId);
-					ps.setInt(3, orgId);
-					ps.setDate(4, (java.sql.Date) date);
-					ps.setDate(5, (java.sql.Date) startTime);
-					ps.setDate(6, (java.sql.Date) startTime);
-					ps.setString(7, details);
+					ps.setInt(1, volId);
+					ps.setInt(2, orgId);
+					ps.setDate(3, (java.sql.Date) date);
+					ps.setDate(4, (java.sql.Date) startTime);
+					ps.setDate(5, (java.sql.Date) endTime);
+					ps.setString(6, details);
 					ps.setString(7, title);
 					
 					return ps.execute();
@@ -159,12 +160,12 @@ public class VolEventResProvider {
 					// its execute insert
 					ps = (PreparedStatement) conn.prepareStatement(insert_sql);
 					//ps.setInt(1,id);
-					ps.setInt(2, volId);
-					ps.setInt(3, orgId);
-					ps.setDate(4, (java.sql.Date) date);
-					ps.setDate(5, (java.sql.Date) startTime);
-					ps.setDate(6, (java.sql.Date) startTime);
-					ps.setString(7, details);
+					ps.setInt(1, volId);
+					ps.setInt(2, orgId);
+					ps.setDate(3, (java.sql.Date) date);
+					ps.setDate(4, (java.sql.Date) startTime);
+					ps.setDate(5, (java.sql.Date) endTime);
+					ps.setString(6, details);
 					ps.setString(7, title);
 					
 					
