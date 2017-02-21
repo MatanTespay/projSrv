@@ -2,6 +2,8 @@ package com.haifa.objects;
 
 import java.util.List;
 
+import com.haifa.utils.FilesUtils;
+
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
@@ -95,7 +97,7 @@ public class Organization {
 		iObj.put("Address", getAddress());
 		iObj.put("Email", getEmail());
 		iObj.put("Password", getPassword());
-		iObj.put("ProfilePic", isImageExists());
+		iObj.put("ProfilePic",  (isImageExists() ?  FilesUtils.blobToBase64String(getProfilePic()) : null ) );
 		return iObj;
 	}
 /**
