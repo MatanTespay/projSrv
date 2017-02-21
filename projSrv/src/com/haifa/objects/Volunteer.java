@@ -3,6 +3,8 @@ package com.haifa.objects;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.haifa.utils.FilesUtils;
+
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
@@ -129,11 +131,11 @@ public class Volunteer {
     		iObj.put("birthDate", getBirthDate());
     		iObj.put("address", getAddress());
     		iObj.put("email", getEmail());
-    		iObj.put("password", getPassword());
-    		iObj.put("password", getPassword());
-    		iObj.put("ProfilePic", isImageExists());
+    		iObj.put("password", getPassword());    	
+    		iObj.put("ProfilePic",  (isImageExists() ?  FilesUtils.blobToBase64String(getProfilePic()) : null ) );
     		return iObj;
     	}
+    	    	
 /**
  * Checks if there is image saved in db.
  * @return true if exist false otherwise

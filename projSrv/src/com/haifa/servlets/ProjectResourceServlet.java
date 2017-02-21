@@ -40,6 +40,15 @@ public class ProjectResourceServlet extends HttpServlet {
 	private static final int GET_ITEM_IMAGE_REQ = 5;
 	private static final int GET_ITEMS_OF_FOLDER_JSON_REQ = 6;
 	private static final int GET_FILE_FROM_FILESYSTEM_REQ = 7;
+	// requserts numbers
+	
+	
+	// VOLUNEER
+	private static final int GET_VOLUNTEER_REQ = 8;
+	private static final String VOL_ID = "volunteerID";
+	private static final String VOL_EMAIL = "it_title";
+
+	
 
 	private static final String FOLDER_ID = "f_id";
 	private static final String FOLDER_TITLE = "f_title";

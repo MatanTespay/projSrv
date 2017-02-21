@@ -7,6 +7,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import javax.xml.bind.DatatypeConverter;
+
 public class FilesUtils {
 
 	public static String appDirName = "";
@@ -80,4 +82,11 @@ public class FilesUtils {
 		return stream.toByteArray();
 	}
 
+	public static String blobToBase64String(byte[] imgByte){
+		String base64 = null;
+		
+		base64 = DatatypeConverter.printBase64Binary(imgByte);
+		
+		return base64;
+	}
 }
