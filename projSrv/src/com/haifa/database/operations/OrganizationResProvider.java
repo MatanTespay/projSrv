@@ -1,9 +1,12 @@
 package com.haifa.database.operations;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -24,9 +27,10 @@ public class OrganizationResProvider {
 			+ " address ,  email ,  password ,  orgPic ) VALUES (?, ?, ?,?, ?,?); ";
 	// delete org query
 	private static final String delete_sql = "DELETE FROM organization WHERE organizationID = ? ;";
+	//select image
+	private static final String select_img_sql = "SELECT image FROM  organization WHERE organizationID = ?;";
 
 	// =========
-	//private static final String select_img_sql = "SELECT image FROM  volunteer WHERE volunteerID = ?;";
 	//private static final String delete_all_sql = "DELETE FROM volunteer WHERE folder_id=?;"; // delete
 																								// items
 																								// folder
@@ -62,9 +66,15 @@ public class OrganizationResProvider {
 				String address = rs.getString("address");
 				String email = rs.getString("email");
 				String password = rs.getString("password");
-				byte[]  orgPic = rs.getBytes("orgPic");
+		
+				//get the image
+				java.sql.Blob imageBlob =  rs.getBlob("orgPic");
 				
-				Organization org = new Organization(id, name, address, email, password, orgPic);
+				byte[] profilePic = null;
+				if (imageBlob != null) {
+					profilePic = imageBlob.getBytes(1, (int) imageBlob.length());
+				}
+				Organization org = new Organization(id, name, address, email, password, profilePic);
 		
 					
 				results.add(org);
@@ -106,7 +116,7 @@ public class OrganizationResProvider {
 	 * @param conn
 	 * @return
 	 */
-	public boolean insertVolunteer(Organization org, Connection conn) {
+	public boolean insertOrganization(Organization org, Connection conn) {
 
 		boolean result = false;
 		ResultSet rs = null;
@@ -123,6 +133,11 @@ public class OrganizationResProvider {
 			String name = org.getName();
 			String address = org.getAddress();
 			byte[] profilePic = org.getProfilePic();
+			
+			if (profilePic == null) {
+				profilePic = getImage(id, conn);
+			}	
+	
 			// get the Organization in db that the id is org.getID
 			stt = (PreparedStatement) conn.prepareStatement(select_sql);
 			//where
@@ -138,7 +153,14 @@ public class OrganizationResProvider {
 					ps.setString(3, address);
 					ps.setString(4, email);
 					ps.setString(5, password);
-					ps.setBytes(6, profilePic);
+					if (profilePic != null) {
+						InputStream is = new ByteArrayInputStream(profilePic);
+						ps.setBlob(6, is);
+
+					} else {
+
+						ps.setNull(8, Types.BLOB);
+					}
 					
 					
 					result = ps.execute();
@@ -151,7 +173,14 @@ public class OrganizationResProvider {
 					ps.setString(3, address);
 					ps.setString(4, email);
 					ps.setString(5, password);
-					ps.setBytes(6, profilePic);
+					if (profilePic != null) {
+						InputStream is = new ByteArrayInputStream(profilePic);
+						ps.setBlob(6, is);
+
+					} else {
+
+						ps.setNull(8, Types.BLOB);
+					}
 					result = ps.execute();
 					//result = true;
 
@@ -200,6 +229,64 @@ public class OrganizationResProvider {
 		return result;
 
 	}
+
+/**
+ * Get image 
+ * @param itemId
+ * @param conn
+ * @return
+ * @throws SQLException
+ */
+public byte[] getImage(int orgId, Connection conn)
+		throws SQLException {
+
+	byte[] result = null;
+
+	ResultSet rs = null;
+	PreparedStatement ps = null;
+	try {
+	
+		ps = conn.prepareStatement(select_img_sql);
+
+		ps.setInt(1, orgId);
+
+		rs = ps.executeQuery();
+
+		while (rs.next()) {
+
+			java.sql.Blob imageBlob = rs.getBlob(1);
+			if (imageBlob != null) {
+				result = imageBlob.getBytes(1, (int) imageBlob.length());
+			}
+		}
+
+	} catch (SQLException e) {
+		throw e;
+
+	} catch (Throwable e) {
+		e.printStackTrace();
+
+	} finally {
+		if (rs != null) {
+			try {
+				rs.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+
+		}
+
+		if (ps != null) {
+			try {
+				ps.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	return result;
+}
 
 	public boolean deleteVolunteer(Organization org, Connection conn) throws SQLException {
 

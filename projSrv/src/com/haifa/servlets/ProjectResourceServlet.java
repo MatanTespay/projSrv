@@ -76,8 +76,8 @@ public class ProjectResourceServlet extends HttpServlet {
 	private static final String VOLEVENTG_DATE  = "date";
 	private static final String VOLEVENT_STARTTIME = "startTime";
 	private static final String VOLEVENT_ENDTIME = "endTime";
-	
 	private static final String VOLEVENTG_DETAILS = "details";
+	private static final String VOLEVENTG_TITLE = "title";
 	
 	private static final String FOLDER_ID = "f_id";
 	private static final String FOLDER_TITLE = "f_title";

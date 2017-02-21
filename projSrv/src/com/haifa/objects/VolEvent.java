@@ -12,13 +12,13 @@ public class VolEvent {
     private int volEventID;
     private int volID;
     private int orgID;
-    private String details;
-    private String title;
     private Date date;
     private Date startTime;
     private Date endTime;
+    private String details;
+    private String title;
 
-    public VolEvent( int orgID,int volID, String details, Date date, Date startTime, Date endTime, String title ) {
+    public VolEvent( int volEventID, int volID,int orgID, Date date,String details,  Date startTime, Date endTime, String title ) {
         this.details = details;
         this.date = date;
         this.startTime = startTime;
