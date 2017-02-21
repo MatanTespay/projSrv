@@ -104,13 +104,6 @@ public class Volunteer {
         this.lName = lName;
     }
 
-/*    public ArrayList<VolEvent> getVolEvents() {
-        return volEvents;
-    }
-
-    public void setVolEvents(ArrayList<VolEvent> volEvents) {
-        this.volEvents = volEvents;
-    }*/
 
     public byte[] getProfilePic() {
         return profilePic;

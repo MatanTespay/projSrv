@@ -12,11 +12,11 @@ import java.util.List;
 
 import com.haifa.objects.Folder;
 import com.haifa.objects.Item;
-import com.haifa.objects.Volunteer;;
+import com.haifa.objects.Volunteer;
+
+;
 
 public class VolunteerResProvider {
-	
-	
 
 	private static final String update_sql = "UPDATE volunteer SET title=?, description=?, image=?, folder_id=? WHERE volunteerID=?;";
 
@@ -24,15 +24,19 @@ public class VolunteerResProvider {
 
 	private static final String select_img_sql = "SELECT image FROM  volunteer WHERE volunteerID=?;";
 
-
 	private static final String insert_sql = "INSERT INTO volunteer (volunteerID, title, description, image, folder_id) VALUES (?, ?, ?, ?, ?);";
 
 	private static final String delete_sql = "DELETE FROM volunteer WHERE volunteerID=?;";
 
-  //=========
-	private static final String delete_all_sql = "DELETE FROM volunteer WHERE folder_id=?;"; // delete  items folder
+	// =========
+	private static final String delete_all_sql = "DELETE FROM volunteer WHERE folder_id=?;"; // delete
+																								// items
+																								// folder
 
-	private static final String select_all_sql = "SELECT * FROM volunteer WHERE folder_id=?;"; // get items of folder
+	private static final String select_all_sql = "SELECT * FROM volunteer WHERE folder_id=?;"; // get
+																								// items
+																								// of
+																								// folder
 
 	public List<Volunteer> getAllVolunteers(Folder folder, Connection conn)
 			throws SQLException {
@@ -65,12 +69,10 @@ public class VolunteerResProvider {
 					image = imageBlob.getBytes(1, (int) imageBlob.length());
 				}
 
-				
-
 				String folderId = rs.getString(5);
-				Item item = new Item(id, title, description, image,folderId);
+				Item item = new Item(id, title, description, image, folderId);
 
-				//results.add(item);
+				// results.add(item);
 
 			}
 
@@ -102,15 +104,14 @@ public class VolunteerResProvider {
 		return results;
 	}
 
-	public byte[] getImage(String itemId, Connection conn)
-			throws SQLException {
+	public byte[] getImage(String itemId, Connection conn) throws SQLException {
 
 		byte[] result = null;
 
 		ResultSet rs = null;
 		PreparedStatement ps = null;
 		try {
-		
+
 			ps = conn.prepareStatement(select_img_sql);
 
 			ps.setString(1, itemId);
@@ -175,8 +176,6 @@ public class VolunteerResProvider {
 				imageBytes = getImage(id, conn);
 			}
 
-			
-
 			stt = (PreparedStatement) conn.prepareStatement(select_sql);
 			stt.setString(1, id);
 
@@ -197,8 +196,6 @@ public class VolunteerResProvider {
 
 						ps.setNull(3, Types.BLOB);
 					}
-
-					
 
 					ps.setString(4, folderId);
 
@@ -225,8 +222,6 @@ public class VolunteerResProvider {
 
 						ps.setNull(4, Types.BLOB);
 					}
-
-					
 
 					ps.setString(5, folderId);
 
