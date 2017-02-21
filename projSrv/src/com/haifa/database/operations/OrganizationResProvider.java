@@ -1,30 +1,36 @@
 package com.haifa.database.operations;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.haifa.objects.Organization;
 import com.haifa.objects.Volunteer;
 
 public class OrganizationResProvider {
 
+	// update organization query
 	private static final String update_sql = "UPDATE  organization  SET  organizationID  = ?,  organizationName  = ?,  address  = ?,  email  = ?,  password  ?,  orgPic  = ? WHERE  organizationID  = ?;";
-
+	// select organization by chosen org query 
 	private static final String select_sql = "SELECT * FROM  organization WHERE organizationID = ?;";
-	
+	// select  all organizations query
 	private static final String selectAll_sql = "SELECT * FROM  organization;";
-
+	// insert org query
 	private static final String insert_sql = "INSERT INTO  organization  ( organizationID ,  organizationName , "
 			+ " address ,  email ,  password ,  orgPic ) VALUES (?, ?, ?,?, ?,?); ";
-
-	private static final String delete_sql = "DELETE FROM volunteer WHERE volunteerID = ? ;";
+	// delete org query
+	private static final String delete_sql = "DELETE FROM organization WHERE organizationID = ? ;";
+	//select image
+	private static final String select_img_sql = "SELECT image FROM  organization WHERE organizationID = ?;";
 
 	// =========
-	//private static final String select_img_sql = "SELECT image FROM  volunteer WHERE volunteerID = ?;";
 	//private static final String delete_all_sql = "DELETE FROM volunteer WHERE folder_id=?;"; // delete
 																								// items
 																								// folder
@@ -33,15 +39,15 @@ public class OrganizationResProvider {
 																								// items
 																								// of
 	/**
-	 * select all volunteers in db.																							// folder
+	 * select all Organizations in db.																							// folder
 	 * @param conn
 	 * @return
 	 * @throws SQLException
 	 */
 
-	public List<Volunteer> getAllVolunteers(Connection conn) throws SQLException {
+	public List<Organization> getAllOrganizations(Connection conn) throws SQLException {
 
-		List<Volunteer> results = new ArrayList<Volunteer>();
+		List<Organization> results = new ArrayList<Organization>();
 
 		ResultSet rs = null;
 		PreparedStatement ps = null;
@@ -52,21 +58,27 @@ public class OrganizationResProvider {
 	
 			rs = ps.executeQuery();
 
-			while (rs.next()) {
-
-				int id = rs.getInt("volunteer");
+			while (rs.next()) {	
+		
+				// columns
+				int id = rs.getInt("organizationID");
+				String name = rs.getString("organizationName");
+				String address = rs.getString("address");
 				String email = rs.getString("email");
 				String password = rs.getString("password");
-				String fName = rs.getString("fName");
-				String lName = rs.getString("lName");
-				String address = rs.getString("address");
-				Date birthDate = rs.getDate("birthDate");
-				byte[] profilePic = rs.getBytes("profilePic");
+		
+				//get the image
+				java.sql.Blob imageBlob =  rs.getBlob("orgPic");
 				
-				Volunteer vol = new Volunteer(id, fName, lName, birthDate, address, email, password, profilePic);
-				results.add(vol);
+				byte[] profilePic = null;
+				if (imageBlob != null) {
+					profilePic = imageBlob.getBytes(1, (int) imageBlob.length());
+				}
+				Organization org = new Organization(id, name, address, email, password, profilePic);
+		
+					
+				results.add(org);
 
-			
 			}
 
 		} catch (SQLException e) {
@@ -98,13 +110,13 @@ public class OrganizationResProvider {
 	}
 
 	/**
-	 * the method gets a volunteer object and checks if it exist, if so the db will update
-	 * the vol otherwise insert new vol.
+	 * the method gets a Organization object and checks if it exist, if so the db will update
+	 * the Organization otherwise insert new Organization.
 	 * @param vol
 	 * @param conn
 	 * @return
 	 */
-	public boolean insertVolunteer(Volunteer vol, Connection conn) {
+	public boolean insertOrganization(Organization org, Connection conn) {
 
 		boolean result = false;
 		ResultSet rs = null;
@@ -114,16 +126,19 @@ public class OrganizationResProvider {
 
 		try {
 
-			int id = vol.getId();
+			int id = org.getId();
 		// the field to update or insert
-			String email = vol.getEmail();
-			String password = vol.getPassword();
-			String fName = vol.getfName();
-			String lName = vol.getlName();
-			String address = vol.getAddress();
-			Date birthDate = vol.getBirthDate();
-			byte[] profilePic = vol.getProfilePic();
-			// get the volunteer in db that the id is vol.getID
+			String email = org.getEmail();
+			String password = org.getPassword();
+			String name = org.getName();
+			String address = org.getAddress();
+			byte[] profilePic = org.getProfilePic();
+			
+			if (profilePic == null) {
+				profilePic = getImage(id, conn);
+			}	
+	
+			// get the Organization in db that the id is org.getID
 			stt = (PreparedStatement) conn.prepareStatement(select_sql);
 			//where
 			stt.setInt(1, id);
@@ -134,22 +149,40 @@ public class OrganizationResProvider {
 					// its execute update
 					ps = (PreparedStatement) conn.prepareStatement(update_sql);
 					ps.setInt(1, id);
-					ps.execute();
-					result = true;
+					ps.setString(2, name);
+					ps.setString(3, address);
+					ps.setString(4, email);
+					ps.setString(5, password);
+					if (profilePic != null) {
+						InputStream is = new ByteArrayInputStream(profilePic);
+						ps.setBlob(6, is);
+
+					} else {
+
+						ps.setNull(8, Types.BLOB);
+					}
+					
+					
+					result = ps.execute();
 				} else {
 
 					// its execute insert
 					ps = (PreparedStatement) conn.prepareStatement(insert_sql);
-					ps.setInt(1,id);
-					ps.setString(2, email);
-					ps.setString(3, password);
-					ps.setString(4, fName);
-					ps.setString(5, lName);
-					ps.setString(6, address);
-					ps.setDate(7, (java.sql.Date) birthDate);
-					ps.setBytes(8, profilePic);
-					ps.execute();
-					result = true;
+					ps.setInt(1, id);
+					ps.setString(2, name);
+					ps.setString(3, address);
+					ps.setString(4, email);
+					ps.setString(5, password);
+					if (profilePic != null) {
+						InputStream is = new ByteArrayInputStream(profilePic);
+						ps.setBlob(6, is);
+
+					} else {
+
+						ps.setNull(8, Types.BLOB);
+					}
+					result = ps.execute();
+					//result = true;
 
 				}
 			}
@@ -197,20 +230,78 @@ public class OrganizationResProvider {
 
 	}
 
-	public boolean deleteVolunteer(Volunteer vol, Connection conn) throws SQLException {
+/**
+ * Get image 
+ * @param itemId
+ * @param conn
+ * @return
+ * @throws SQLException
+ */
+public byte[] getImage(int orgId, Connection conn)
+		throws SQLException {
+
+	byte[] result = null;
+
+	ResultSet rs = null;
+	PreparedStatement ps = null;
+	try {
+	
+		ps = conn.prepareStatement(select_img_sql);
+
+		ps.setInt(1, orgId);
+
+		rs = ps.executeQuery();
+
+		while (rs.next()) {
+
+			java.sql.Blob imageBlob = rs.getBlob(1);
+			if (imageBlob != null) {
+				result = imageBlob.getBytes(1, (int) imageBlob.length());
+			}
+		}
+
+	} catch (SQLException e) {
+		throw e;
+
+	} catch (Throwable e) {
+		e.printStackTrace();
+
+	} finally {
+		if (rs != null) {
+			try {
+				rs.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+
+		}
+
+		if (ps != null) {
+			try {
+				ps.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	return result;
+}
+
+	public boolean deleteVolunteer(Organization org, Connection conn) throws SQLException {
 
 		boolean result = false;
 		PreparedStatement ps = null;
 		try {
 
-			if (vol != null) {
+			if (org != null) {
 				
-				int id = vol.getId();
+				int id = org.getId();
 						
 
 				ps = (PreparedStatement) conn.prepareStatement(delete_sql);
 
-			
+			//delete the recored
 				ps.setInt(1, id);
 				
 				ps.execute();
