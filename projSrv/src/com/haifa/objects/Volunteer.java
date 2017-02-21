@@ -1,6 +1,10 @@
 package com.haifa.objects;
 
 import java.util.ArrayList;
+import java.util.List;
+
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 
 /**
  * Created by Faina0502 on 21/01/2017.
@@ -115,4 +119,72 @@ public class Volunteer {
     public void setProfilePic(byte[] profilePic) {
         this.profilePic = profilePic;
     }
+    /**
+     * Create a json object from Org. object
+     * @return
+     */
+
+    	public JSONObject toJson() {	
+//    public  Volunteer (int id , String fName, String lName,
+    		//String birthDate, String address, String email, String 
+    		//password, byte[] profilePic ){
+
+    		JSONObject iObj = new JSONObject();
+    		iObj.put("orgID", getId());
+    		iObj.put("volID", getfName());
+    		iObj.put("details", getlName());
+    		iObj.put("birthDate", getBirthDate());
+    		iObj.put("address", getAddress());
+    		iObj.put("email", getEmail());
+    		iObj.put("password", getPassword());
+    		iObj.put("password", getPassword());
+    		iObj.put("ProfilePic", isImageExists());
+    		return iObj;
+    	}
+/**
+ * Checks if there is image saved in db.
+ * @return true if exist false otherwise
+ */
+		private boolean isImageExists() {
+    			if (profilePic == null || profilePic.length == 0) {
+    				return false;
+    			}
+    			return true;
+    		}
+   
+    /**
+     * 
+     * @param list
+     * @return
+     */
+    	public static String toJson(List<VolEvent> list) {
+
+    		JSONObject jsonObj = new JSONObject();
+
+    		if (list == null) {
+    			return null;
+    		}
+
+    		if (list.size() == 0) {
+    			return null;
+    		}
+
+    		JSONArray jsonArray = new JSONArray();
+
+    		for (VolEvent event : list) {
+
+    			if (event != null) {
+
+    				JSONObject itemObj = event.toJson();
+
+    				jsonArray.add(itemObj);
+    			}
+
+    		}
+
+    		jsonObj.put("VolEvents", jsonArray);
+
+    		return jsonObj.toString(2);
+    	}
+
 }
