@@ -19,7 +19,7 @@ public class ConnPool {
 	List<Connection> usedconnlist = new ArrayList<Connection>();
 	List<Connection> availableconnlist = new ArrayList<Connection>();
 	
-	String jdbcUrl = "jdbc:mysql://localhost:3306/mynotesdb?autoReconnect=true&useUnicode=true&characterEncoding=UTF-8";
+	String jdbcUrl = "jdbc:mysql://localhost:3306/volutimedb?autoReconnect=true&useUnicode=true&characterEncoding=UTF-8";
 	private String user = "root"; 
 	private String password = "1234";
 	//private String password = "is22mb";
