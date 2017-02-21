@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.Date;
 
 import javax.xml.bind.DatatypeConverter;
 
@@ -89,4 +90,14 @@ public class FilesUtils {
 		
 		return base64;
 	}
+
+    /**
+     * Converts the given java.util.Date to java.sql.Date.
+     * @param date The java.util.Date to be converted to java.sql.Date.
+     * @return The converted java.sql.Date.
+     */
+    public static Date toSqlDate(java.util.Date date) {
+     return (date != null) ? new Date(date.getTime()) : null;
+    }
+    
 }

@@ -14,18 +14,19 @@ import java.util.List;
 import com.haifa.objects.Folder;
 import com.haifa.objects.Item;
 import com.haifa.objects.Volunteer;
+import com.haifa.utils.FilesUtils;
 
 
 
 public class VolunteerResProvider {
 
-	private static final String update_sql = "UPDATE volunteer SET title=?, description = ?, image = ?, folder_id = ? WHERE volunteerID = ?;";
+	private static final String update_sql = "UPDATE volunteer SET email =?, password = ?, fName = ?, lName = ? , address =? , birthDate = ?, profilePic = ? WHERE volunteerID = ?;";
 
 	private static final String select_sql = "SELECT * FROM  volunteer WHERE volunteerID = ?;";
 	
 	private static final String selectAll_sql = "SELECT * FROM  volunteer;";
 
-	private static final String insert_sql = "INSERT INTO volunteer (volunteerID, title, description, image, folder_id) VALUES (?, ?, ?, ?, ?);";
+	private static final String insert_sql = "INSERT INTO volunteer (email, password , fName , lName , address  , birthDate, profilePic ) VALUES (?, ?, ?, ?, ?, ?, ?);";
 
 	private static final String delete_sql = "DELETE FROM volunteer WHERE volunteerID = ? ;";
 
@@ -67,7 +68,14 @@ public class VolunteerResProvider {
 				String lName = rs.getString("lName");
 				String address = rs.getString("address");
 				Date birthDate = rs.getDate("birthDate");
-				byte[] profilePic = rs.getBytes("profilePic");
+				
+				//get the image
+				java.sql.Blob imageBlob =  rs.getBlob("profilePic");
+				
+				byte[] profilePic = null;
+				if (imageBlob != null) {
+					profilePic = imageBlob.getBytes(1, (int) imageBlob.length());
+				}
 				
 				Volunteer vol = new Volunteer(id, fName, lName, birthDate, address, email, password, profilePic);
 				results.add(vol);
@@ -131,31 +139,37 @@ public class VolunteerResProvider {
 			byte[] profilePic = vol.getProfilePic();
 			// get the volunteer in db that the id is vol.getID
 			stt = (PreparedStatement) conn.prepareStatement(select_sql);
-			//where
-			stt.setInt(1, id);
+			stt.setInt(1, id);			
 			
 			if (stt.execute()) {
 				rs1 = stt.getResultSet();
 				if (rs1.next()) {
 					// its execute update
 					ps = (PreparedStatement) conn.prepareStatement(update_sql);
-					ps.setInt(1, id);
-					ps.execute();
-					result = true;
-				} else {
-
-					// its execute insert
-					ps = (PreparedStatement) conn.prepareStatement(insert_sql);
-					ps.setInt(1,id);
 					ps.setString(2, email);
 					ps.setString(3, password);
 					ps.setString(4, fName);
 					ps.setString(5, lName);
 					ps.setString(6, address);
-					ps.setDate(7, (java.sql.Date) birthDate);
+					ps.setDate(7, FilesUtils. toSqlDate(birthDate));
 					ps.setBytes(8, profilePic);
-					ps.execute();
-					result = true;
+					
+					return ps.execute();
+					//result = true;
+				} else {
+
+					// its execute insert
+					ps = (PreparedStatement) conn.prepareStatement(insert_sql);
+					//ps.setInt(1,id);
+					ps.setString(2, email);
+					ps.setString(3, password);
+					ps.setString(4, fName);
+					ps.setString(5, lName);
+					ps.setString(6, address);
+					ps.setDate(7, FilesUtils. toSqlDate(birthDate));
+					ps.setBytes(8, profilePic);
+					return  ps.execute();
+					//result = true;
 
 				}
 			}
@@ -213,15 +227,14 @@ public class VolunteerResProvider {
 				
 				int id = vol.getId();
 						
-
 				ps = (PreparedStatement) conn.prepareStatement(delete_sql);
 
 			
 				ps.setInt(1, id);
 				
-				ps.execute();
+				return ps.execute();
 
-				result = true;
+				//result = true;
 			}
 
 		} catch (SQLException e) {
