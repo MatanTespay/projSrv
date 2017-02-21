@@ -155,7 +155,7 @@ public class Volunteer {
      * @param list
      * @return
      */
-    	public static String toJson(List<VolEvent> list) {
+    	public static String toJson(List<Volunteer> list) {
 
     		JSONObject jsonObj = new JSONObject();
 
@@ -169,7 +169,7 @@ public class Volunteer {
 
     		JSONArray jsonArray = new JSONArray();
 
-    		for (VolEvent event : list) {
+    		for (Volunteer event : list) {
 
     			if (event != null) {
 
@@ -180,7 +180,7 @@ public class Volunteer {
 
     		}
 
-    		jsonObj.put("VolEvents", jsonArray);
+    		jsonObj.put("Volunteer", jsonArray);
 
     		return jsonObj.toString(2);
     	}
