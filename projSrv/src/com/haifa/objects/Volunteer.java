@@ -130,7 +130,6 @@ public class Volunteer {
     		iObj.put("address", getAddress());
     		iObj.put("email", getEmail());
     		iObj.put("password", getPassword());
-    		iObj.put("password", getPassword());
     		iObj.put("ProfilePic", isImageExists());
     		return iObj;
     	}
