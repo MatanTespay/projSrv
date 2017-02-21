@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.ServletConfig;
@@ -45,11 +46,39 @@ public class ProjectResourceServlet extends HttpServlet {
 	
 	// VOLUNEER
 	private static final int GET_VOLUNTEER_REQ = 8;
+	// columns
 	private static final String VOL_ID = "volunteerID";
-	private static final String VOL_EMAIL = "it_title";
+	private static final String VOL_EMAIL = "email";
+	private static final String VOL_PASSWORD = "password";
+	private static final String VOL_FNAME = "fName";
+	private static final String VOL_LNAME = "lName";
+	private static final String VOL_ADDRESS = "address";
+	private static final String VOL_BIRTHDATE = "birthDate";
+	private static final String VOL_PROFILEPIC = "profilePic";
 
+	//ORGANIZATION
+	private static final int GET_ORGANIZATION_REQ = 9;
+	// columns
+	private static final String ORG_ID = "organizationID";
+	private static final String ORG_NAME = "organizationName";
+	private static final String ORG_ADDRESS = "address";
+	private static final String ORG_EMAIL = "email";
+	private static final String ORG_PASSWORD = "password";
+	private static final String ORG_ORGPIC = "orgPic";
 	
+	//VOLEVENT
+	private static final int GET_VOLEVENT_REQ = 10;
 
+	// columns
+	private static final String VOLEVENT_ID = "eventID";
+	private static final String VOLEVENT_VOLUNTEERID = "volunteerID";
+	private static final String VOLEVENT_ORGANIZATIONID = "organizationID";
+	private static final String VOLEVENTG_DATE  = "date";
+	private static final String VOLEVENT_STARTTIME = "startTime";
+	private static final String VOLEVENT_ENDTIME = "endTime";
+	
+	private static final String VOLEVENTG_DETAILS = "details";
+	
 	private static final String FOLDER_ID = "f_id";
 	private static final String FOLDER_TITLE = "f_title";
 
@@ -280,6 +309,14 @@ public class ProjectResourceServlet extends HttpServlet {
 						} else {
 							resp.sendError(404);
 						}
+
+						retry = 0;
+						break;
+					}
+					case GET_VOLUNTEER_REQ: {
+						String volID = req.getParameter(VOL_ID);
+						
+						
 
 						retry = 0;
 						break;

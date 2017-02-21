@@ -1,6 +1,7 @@
 package com.haifa.objects;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import com.haifa.utils.FilesUtils;
@@ -16,14 +17,15 @@ public class Volunteer {
     private int id;
     private String fName;
     private String lName;
-    private String birthDate;
+    private Date birthDate;
     private String address;
     private String email;
     private String password;
     private byte[] profilePic;
     //private ArrayList<VolEvent> volEvents;
 
-    public Volunteer(String fName, String lName, String birthDate, String address, String email , String password,byte[] profilePic){
+    public Volunteer(String fName, String lName, Date birthDate, String address, String email , String password,
+    		byte[] profilePic){
         this.fName = fName;
         this.lName =lName;
         this.birthDate =birthDate;
@@ -37,7 +39,8 @@ public class Volunteer {
     public Volunteer() {
     }
 
-    public  Volunteer (int id , String fName, String lName, String birthDate, String address, String email, String password, byte[] profilePic ){
+    public  Volunteer (int id , String fName, String lName, Date birthDate, String address, String email, 
+    		String password, byte[] profilePic ){
         this.id =id;
         this.fName = fName;
         this.lName =lName;
@@ -62,7 +65,7 @@ public class Volunteer {
         this.password = password;
     }
 
-    public String getBirthDate() {
+    public Date getBirthDate() {
         return birthDate;
     }
 
@@ -86,7 +89,7 @@ public class Volunteer {
         this.address = address;
     }
 
-    public void setBirthDate(String birthDate) {
+    public void setBirthDate(Date birthDate) {
         this.birthDate = birthDate;
     }
 

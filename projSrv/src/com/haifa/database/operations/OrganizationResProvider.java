@@ -1,31 +1,25 @@
 package com.haifa.database.operations;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import com.haifa.objects.Folder;
-import com.haifa.objects.Item;
 import com.haifa.objects.Volunteer;
 
+public class OrganizationResProvider {
 
+	private static final String update_sql = "UPDATE  organization  SET  organizationID  = ?,  organizationName  = ?,  address  = ?,  email  = ?,  password  ?,  orgPic  = ? WHERE  organizationID  = ?;";
 
-public class VolunteerResProvider {
-
-	private static final String update_sql = "UPDATE volunteer SET title=?, description = ?, image = ?, folder_id = ? WHERE volunteerID = ?;";
-
-	private static final String select_sql = "SELECT * FROM  volunteer WHERE volunteerID = ?;";
+	private static final String select_sql = "SELECT * FROM  organization WHERE organizationID = ?;";
 	
-	private static final String selectAll_sql = "SELECT * FROM  volunteer;";
+	private static final String selectAll_sql = "SELECT * FROM  organization;";
 
-	private static final String insert_sql = "INSERT INTO volunteer (volunteerID, title, description, image, folder_id) VALUES (?, ?, ?, ?, ?);";
+	private static final String insert_sql = "INSERT INTO  organization  ( organizationID ,  organizationName , "
+			+ " address ,  email ,  password ,  orgPic ) VALUES (?, ?, ?,?, ?,?); ";
 
 	private static final String delete_sql = "DELETE FROM volunteer WHERE volunteerID = ? ;";
 
@@ -240,5 +234,4 @@ public class VolunteerResProvider {
 
 		return result;
 	}
-
 }
