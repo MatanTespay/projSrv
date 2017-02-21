@@ -1,5 +1,6 @@
 package com.haifa.objects;
 
+import java.sql.Blob;
 import java.util.List;
 
 import com.haifa.utils.FilesUtils;
@@ -16,13 +17,6 @@ public class Organization {
     private String password;
     private byte[] profilePic;
 
-    public Organization(String name, String address,byte[] profilePic){
-        this(0,  name, address,  "",  "",  profilePic);
-    }
-
-    public Organization(String name, String address, String email , String password,byte[] profilePic){
-        this(0,  name, address,  email,  password,  profilePic);
-    }
 
     public Organization(int id , String name, String address, 
     		String email, String password, byte[] profilePic){
@@ -93,7 +87,7 @@ public class Organization {
 
 		JSONObject iObj = new JSONObject();
 		iObj.put("id", getId());
-		iObj.put("title", getName());
+		iObj.put("organizationName", getName());
 		iObj.put("Address", getAddress());
 		iObj.put("Email", getEmail());
 		iObj.put("Password", getPassword());
