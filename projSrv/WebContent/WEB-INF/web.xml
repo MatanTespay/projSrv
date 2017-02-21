@@ -52,4 +52,15 @@
 		<url-pattern>/web_item_manage</url-pattern>
 	</servlet-mapping>
 
+	<servlet>
+		<description></description>
+		<display-name>WebVolManageServlet</display-name>
+		<servlet-name>WebVolManageServlet</servlet-name>
+		<servlet-class>com.haifa.servlets.WebVolManageServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>WebVolManageServlet</servlet-name>
+		<url-pattern>/web_vol_manage</url-pattern>
+	</servlet-mapping>
+	
 </web-app>

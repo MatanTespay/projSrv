@@ -21,8 +21,10 @@ import javax.servlet.http.HttpServletResponse;
 import com.haifa.database.operations.ConnPool;
 import com.haifa.database.operations.FoldersResProvider;
 import com.haifa.database.operations.ItemsResProvider;
+import com.haifa.database.operations.VolunteerResProvider;
 import com.haifa.objects.Folder;
 import com.haifa.objects.Item;
+import com.haifa.objects.Volunteer;
 import com.haifa.utils.FilesUtils;
 
 /**
@@ -45,7 +47,7 @@ public class ProjectResourceServlet extends HttpServlet {
 	
 	
 	// VOLUNEER
-	private static final int GET_VOLUNTEER_REQ = 8;
+	private static final int GET_VOLUNTEERS_REQ = 8;
 	// columns
 	private static final String VOL_ID = "volunteerID";
 	private static final String VOL_EMAIL = "email";
@@ -57,7 +59,7 @@ public class ProjectResourceServlet extends HttpServlet {
 	private static final String VOL_PROFILEPIC = "profilePic";
 
 	//ORGANIZATION
-	private static final int GET_ORGANIZATION_REQ = 9;
+	private static final int GET_ORGANIZATIONS_REQ = 9;
 	// columns
 	private static final String ORG_ID = "organizationID";
 	private static final String ORG_NAME = "organizationName";
@@ -67,7 +69,7 @@ public class ProjectResourceServlet extends HttpServlet {
 	private static final String ORG_ORGPIC = "orgPic";
 	
 	//VOLEVENT
-	private static final int GET_VOLEVENT_REQ = 10;
+	private static final int GET_VOLEVENTS_REQ = 10;
 
 	// columns
 	private static final String VOLEVENT_ID = "eventID";
@@ -313,9 +315,27 @@ public class ProjectResourceServlet extends HttpServlet {
 						retry = 0;
 						break;
 					}
-					case GET_VOLUNTEER_REQ: {
-						String volID = req.getParameter(VOL_ID);
+					case GET_VOLUNTEERS_REQ: {
+					
+						conn = ConnPool.getInstance().getConnection();
+						VolunteerResProvider v_provider = new VolunteerResProvider();
+						List<Volunteer> v_list = v_provider.getAllVolunteers(conn);
+						String resultJson = Volunteer.toJson(v_list);
 						
+						/*FoldersResProvider foldersResProvider = new FoldersResProvider();
+						List<Folder> foldersList = foldersResProvider
+								.getAllFolders(conn);*/
+						//String resultJson = Folder.toJson(foldersList);
+
+						if (resultJson != null && !resultJson.isEmpty()) {
+							respPage = resultJson;
+							resp.addHeader("Content-Type",
+									"application/json; charset=UTF-8");
+							PrintWriter pw = resp.getWriter();
+							pw.write(respPage);
+						} else {
+							resp.sendError(404);
+						}
 						
 
 						retry = 0;

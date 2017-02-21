@@ -7,11 +7,14 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Date;
+import java.text.SimpleDateFormat;
 
 import javax.xml.bind.DatatypeConverter;
 
 public class FilesUtils {
 
+	 private static SimpleDateFormat longformatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	 
 	public static String appDirName = "";
 
 	public static boolean writeLocalCopy(String fileName, byte[] bytes, boolean append) {
@@ -99,5 +102,19 @@ public class FilesUtils {
     public static Date toSqlDate(java.util.Date date) {
      return (date != null) ? new Date(date.getTime()) : null;
     }
+    
+    public static Date getDateTimeFromString(String dateString){
+        Date date = null;
+        try {
+                if(dateString != null && !dateString.equals(""))
+                date = (Date) longformatter.parse(dateString);
+                
+        }catch(Throwable t) {
+            t.printStackTrace();
+        }
+
+        return  date;
+    }
+    
     
 }

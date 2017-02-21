@@ -61,7 +61,7 @@ public class VolunteerResProvider {
 
 			while (rs.next()) {
 
-				int id = rs.getInt("volunteer");
+				int id = rs.getInt("volunteerID");
 				String email = rs.getString("email");
 				String password = rs.getString("password");
 				String fName = rs.getString("fName");

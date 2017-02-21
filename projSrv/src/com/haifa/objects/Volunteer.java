@@ -128,14 +128,14 @@ public class Volunteer {
     		//password, byte[] profilePic ){
 
     		JSONObject iObj = new JSONObject();
-    		iObj.put("orgID", getId());
-    		iObj.put("volID", getfName());
-    		iObj.put("details", getlName());
+    		iObj.put("volID", getId());
+    		iObj.put("fname", getfName());
+    		iObj.put("lname", getlName());
     		iObj.put("birthDate", getBirthDate());
     		iObj.put("address", getAddress());
     		iObj.put("email", getEmail());
     		iObj.put("password", getPassword());    	
-    		iObj.put("ProfilePic",  (isImageExists() ?  FilesUtils.blobToBase64String(getProfilePic()) : null ) );
+    		iObj.put("ProfilePic",  (isImageExists() ?  FilesUtils.blobToBase64String(getProfilePic()) : "" ) );
     		return iObj;
     	}
     	    	
@@ -155,7 +155,7 @@ public class Volunteer {
      * @param list
      * @return
      */
-    	public static String toJson(List<VolEvent> list) {
+    	public static String toJson(List<Volunteer> list) {
 
     		JSONObject jsonObj = new JSONObject();
 
@@ -169,18 +169,18 @@ public class Volunteer {
 
     		JSONArray jsonArray = new JSONArray();
 
-    		for (VolEvent event : list) {
+    		for (Volunteer vol : list) {
 
-    			if (event != null) {
+    			if (vol != null) {
 
-    				JSONObject itemObj = event.toJson();
+    				JSONObject itemObj = vol.toJson();
 
     				jsonArray.add(itemObj);
     			}
 
     		}
 
-    		jsonObj.put("VolEvents", jsonArray);
+    		jsonObj.put("volunteers", jsonArray);
 
     		return jsonObj.toString(2);
     	}

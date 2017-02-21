@@ -2,6 +2,7 @@ package com.haifa.servlets;
 
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
@@ -21,30 +22,34 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 
 import com.haifa.database.operations.ConnPool;
 import com.haifa.database.operations.ItemsResProvider;
+import com.haifa.database.operations.VolunteerResProvider;
 import com.haifa.objects.Item;
+import com.haifa.objects.Volunteer;
 import com.haifa.utils.FilesUtils;
 
 /**
  * Servlet implementation class WebItemsManageServlet
  */
 
-public class WebItemsManageServlet extends HttpServlet {
+public class WebVolManageServlet extends HttpServlet {
 
-	
 	private static final long serialVersionUID = 1L;
-	
-	
+
 	private static final String RESOURCE_FAIL_TAG = "{\"result_code\":0}";
 	private static final String RESOURCE_SUCCESS_TAG = "{\"result_code\":1}";
-	
-	private static final String ITEM_ID = "it_id";
-	private static final String ITEM_TITLE = "it_title";
-	private static final String ITEM_DESCRIPTION = "it_desc";
-	private static final String ITEM_FOLDER_ID = "it_fid";
+
+	private static final String VOL_ID = "volunteerID";
+	private static final String VOL_EMAIL = "email";
+	private static final String VOL_PASSWORD = "password";
+	private static final String VOL_FNAME = "fName";
+	private static final String VOL_LNAME = "lName";
+	private static final String VOL_ADDRESS = "address";
+	private static final String VOL_BIRTHDATE = "birthDate";
+	private static final String VOL_PROFILEPIC = "profilePic";
+
 	private static final String IS_DELETE = "delete";
-	public static final int DB_RETRY_TIMES=5;
-	
-	
+	public static final int DB_RETRY_TIMES = 5;
+
 	public void init(ServletConfig config) throws ServletException {
 
 		super.init();
@@ -58,33 +63,42 @@ public class WebItemsManageServlet extends HttpServlet {
 
 	}
 
-	
 	protected void service(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
-		
+
 		// Commons file upload classes are specifically instantiated
 		FileItemFactory factory = new DiskFileItemFactory();
 
 		ServletFileUpload upload = new ServletFileUpload(factory);
 		ServletOutputStream out = null;
-		
+
 		int retry = DB_RETRY_TIMES;
 		Connection conn = null;
-		
-		
-		
-		String itemId = null;
-		String itemTitle = null;
-		String itemDesc = null;
-		String itemFolderId = null;
+
+		/**
+		 * private static final String VOL_ID = "volunteerID"; private static
+		 * final String VOL_EMAIL = "email"; private static final String
+		 * VOL_PASSWORD = "password"; private static final String VOL_FNAME =
+		 * "fName"; private static final String VOL_LNAME = "lName"; private
+		 * static final String VOL_ADDRESS = "address"; private static final
+		 * String VOL_BIRTHDATE = "birthDate"; private static final String
+		 * VOL_PROFILEPIC = "profilePic";
+		 */
+		String volID = null;
+		String email = null;
+		String fName = null;
+		String lName = null;
+		String address = null;
+		String birthDate = null;
+		String imageString = null;
+		String password = null;		
 		boolean isDelete = false;
 		String fileName = null;
-		
-		byte [] image= null;
+		byte[] image = null;
 		String respPage = RESOURCE_FAIL_TAG;
 		try {
-			
-			System.out.println("=======Item Servlet =======");
+
+			System.out.println("=======VOl Servlet =======");
 			// Parse the incoming HTTP request
 			// Commons takes over incoming request at this point
 			// Get an iterator for all the data that was sent
@@ -105,28 +119,37 @@ public class WebItemsManageServlet extends HttpServlet {
 				// If the current item is an HTML form field
 				if (item.isFormField()) {
 					// If the current item is file data
-					
+
 					// If the current item is file data
 					String fieldname = item.getFieldName();
 					String fieldvalue = item.getString();
 
 					System.out.println(fieldname + "=" + fieldvalue);
+					
+					if (fieldname.equals(VOL_ID)) {
+						volID = fieldvalue;
+					} else if (fieldname.equals(VOL_EMAIL)) {
+						email = fieldvalue;
+					} else if (fieldname.equals(VOL_FNAME)) {
+						fName = fieldvalue;
+					} else if (fieldname.equals(VOL_LNAME)) {
+						lName = fieldvalue;
+					} else if (fieldname.equals(VOL_ADDRESS)) {
+						address = fieldvalue;
+					} else if (fieldname.equals(VOL_PASSWORD)) {
+						password = fieldvalue;					
+					} else if (fieldname.equals(VOL_BIRTHDATE)) {
+						birthDate = fieldvalue;
+					}
+					else if (fieldname.equals(VOL_PROFILEPIC)) {
+						//check for image
+						imageString = fieldvalue;
+					}else if (fieldname.equals(IS_DELETE)) {
 
-				
-					if (fieldname.equals(ITEM_ID)) {
-						itemId =fieldvalue;
-					} else if (fieldname.equals(ITEM_TITLE)) {
-						itemTitle = fieldvalue;
-					} else if (fieldname.equals(ITEM_DESCRIPTION)) {
-						itemDesc = fieldvalue;
-					} else if (fieldname.equals(ITEM_FOLDER_ID)) {
-						itemFolderId = fieldvalue;
+						isDelete = Boolean.valueOf(fieldvalue);
+
 					}
-					else if(fieldname.equals(IS_DELETE)){
-						isDelete = Boolean.valueOf(fieldvalue);						
-					}
-					
-					
+
 				} else {
 
 					fileName = item.getName();
@@ -134,37 +157,46 @@ public class WebItemsManageServlet extends HttpServlet {
 
 				}
 			}
-			
+
 			while (retry > 0) {
 
 				try {
 
-				
 					conn = ConnPool.getInstance().getConnection();
+
+					VolunteerResProvider volProvider = new VolunteerResProvider();
 					
-					ItemsResProvider itemResProvider = new ItemsResProvider();
-					Item item = new Item(itemId, itemTitle, itemDesc, image, itemFolderId);
+					Date date = FilesUtils.getDateTimeFromString(birthDate);
 					
-					if(isDelete){
-						
-						
-						if(itemResProvider.deleteItem(item, conn)){
+					Volunteer vol = new Volunteer(fName, lName, date, address, email, password, null);
+					
+					/*ItemsResProvider itemResProvider = new ItemsResProvider();
+					Item item = new Item(volID, email, fName, image, lName);*/
+
+					if (isDelete) {
+
+						if(volProvider.deleteVolunteer(vol, conn)){
 							respPage = RESOURCE_SUCCESS_TAG;
 						}
-						
-					}
-					else{
-						if(itemResProvider.insertItem(item, conn)){
+						/*if (itemResProvider.deleteItem(item, conn)) {
+							respPage = RESOURCE_SUCCESS_TAG;
+						}*/
+
+					} else {
+					/*	if (itemResProvider.insertItem(item, conn)) {
+							respPage = RESOURCE_SUCCESS_TAG;
+						}*/
+						if (volProvider.insertVolunteer(vol, conn)) {
 							respPage = RESOURCE_SUCCESS_TAG;
 						}
-						
+
 					}
-					
-					if(image!=null && image.length>0){
-			
+
+					if (image != null && image.length > 0) {
+
 						FilesUtils.writeLocalCopy(fileName, image, false);
 					}
-					
+
 					retry = 0;
 
 				} catch (SQLException e) {
@@ -180,11 +212,10 @@ public class WebItemsManageServlet extends HttpServlet {
 				}
 
 			}
-			
+
 			out.println(respPage);
 			out.close();
-			
-	
+
 		} catch (FileUploadException fue) {
 			fue.printStackTrace();
 		} catch (IOException ioe) {

@@ -14,7 +14,31 @@
   		
 </form>
 <br>
-
+<h3> ITEM INSERT/UPDATE/REMOVE OPERATIONS </h3> 
+<form method="post" action="http://localhost:8080/projSrv/web_vol_manage?" name="submit" enctype="multipart/form-data">
+ 
+  		<input type="checkbox" name="delete" value="true" >delete<br /><br />
+		<label> 
+		    email: <input type="text" name="fName" /> <br /> <br />
+		</label> 
+		<label> 
+		    password: <input type="text" name="password" /> <br /> <br />
+		</label> 
+		<label> 
+		   first name: <input type="text" name="fName" /> <br /> <br />
+		</label> 
+		<label>
+			last name : <input type="text" name="lName"   /><br /> <br />
+		</label> 
+		<label>
+			address: <input type="text"  name="address" /><br /> <br /> 
+		</label>		
+  		<label>
+  		    picture : <input type="file" name="profilePic"><br /><br />
+  		</label>
+  		<input type="submit" name="submit" value="ok">
+  		
+</form>
 <h3>GET ALL NOTES FOLDERS</h3>
 <form method="post" action="http://localhost:8080/projSrv/projres?" name="submit">
 		<input type="hidden" name="req" value="0"> 
