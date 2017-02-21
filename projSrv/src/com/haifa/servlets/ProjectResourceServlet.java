@@ -321,11 +321,6 @@ public class ProjectResourceServlet extends HttpServlet {
 						VolunteerResProvider v_provider = new VolunteerResProvider();
 						List<Volunteer> v_list = v_provider.getAllVolunteers(conn);
 						String resultJson = Volunteer.toJson(v_list);
-						
-						/*FoldersResProvider foldersResProvider = new FoldersResProvider();
-						List<Folder> foldersList = foldersResProvider
-								.getAllFolders(conn);*/
-						//String resultJson = Folder.toJson(foldersList);
 
 						if (resultJson != null && !resultJson.isEmpty()) {
 							respPage = resultJson;
