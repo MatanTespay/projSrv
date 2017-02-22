@@ -20,9 +20,11 @@ import com.haifa.utils.FilesUtils;
 
 public class VolunteerResProvider {
 
-	private static final String update_sql = "UPDATE volunteer SET  email = ?, password = ?, fName = ?, lName = ? , address =? , birthDate = ?, profilePic = ? WHERE volunteerID = ?;";
+	private static final String update_sql = "UPDATE volunteer SET  password = ?, fName = ?, lName = ? , address =? , birthDate = ?, profilePic = ? WHERE volunteerID = ?;";
 
 	private static final String select_sql = "SELECT * FROM  volunteer WHERE volunteerID = ?;";
+	
+	private static final String select_byEmail_sql = "SELECT * FROM  volunteer WHERE  email = ?;";
 	
 	private static final String selectAll_sql = "SELECT * FROM  volunteer;";
 
@@ -146,27 +148,29 @@ public class VolunteerResProvider {
 			}
 			
 			// get the volunteer in db that the id is vol.getID
-			stt = (PreparedStatement) conn.prepareStatement(select_sql);
-			stt.setInt(1, id);			
+			stt = (PreparedStatement) conn.prepareStatement(select_byEmail_sql);
+			stt.setString(1, email);			
 			
 			if (stt.execute()) {
 				rs1 = stt.getResultSet();
 				if (rs1.next()) {
 					// its execute update
 					ps = (PreparedStatement) conn.prepareStatement(update_sql);
-					ps.setString(1, email);
-					ps.setString(2, password);
-					ps.setString(3, fName);
-					ps.setString(4, lName);
-					ps.setString(5, address);
-					ps.setDate(6, FilesUtils. toSqlDate(birthDate));
+					id = rs1.getInt("volunteerID");
+					ps.setInt(7, id);
+					
+					ps.setString(1, password);
+					ps.setString(2, fName);
+					ps.setString(3, lName);
+					ps.setString(4, address);
+					ps.setDate(5, FilesUtils. toSqlDate(birthDate));
 					if (profilePic != null) {
 						InputStream is = new ByteArrayInputStream(profilePic);
-						ps.setBlob(7, is);
+						ps.setBlob(6, is);
 
 					} else {
 
-						ps.setNull(7, Types.BLOB);
+						ps.setNull(6, Types.BLOB);
 					}
 					
 				 ps.execute();
@@ -301,22 +305,29 @@ public class VolunteerResProvider {
 
 		boolean result = false;
 		PreparedStatement ps = null;
+		PreparedStatement stt = null;
+		ResultSet rs1 = null;
+		
 		try {
+			// get the volunteer in db that the id is vol.getID
+			stt = (PreparedStatement) conn.prepareStatement(select_byEmail_sql);
+			stt.setString(1,vol.getEmail());
 
-			if (vol != null) {
-				
-				int id = vol.getId();
-						
-				ps = (PreparedStatement) conn.prepareStatement(delete_sql);
+			if (stt.execute()) {
+				rs1 = stt.getResultSet();
+				if (rs1.next()) {
+					
+					int id = vol.getId();
+					id = rs1.getInt("volunteerID");
+					
+					ps = (PreparedStatement) conn.prepareStatement(delete_sql); 
+					ps.setInt(1, id);
+					 ps.execute();
 
-			
-				ps.setInt(1, id);
-				
-				return ps.execute();
-
-				//result = true;
+					result = true;
+				}
 			}
-
+			
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {

@@ -21,33 +21,29 @@ import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 
 import com.haifa.database.operations.ConnPool;
-import com.haifa.database.operations.ItemsResProvider;
+import com.haifa.database.operations.OrganizationResProvider;
 import com.haifa.database.operations.VolunteerResProvider;
-import com.haifa.objects.Item;
+import com.haifa.objects.Organization;
 import com.haifa.objects.Volunteer;
 import com.haifa.utils.FilesUtils;
 
-/**
- * Servlet implementation class WebItemsManageServlet
- */
-
-public class WebVolManageServlet extends HttpServlet {
+public class WebOrgManageServlet extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
 
 	private static final String RESOURCE_FAIL_TAG = "{\"result_code\":0}";
 	private static final String RESOURCE_SUCCESS_TAG = "{\"result_code\":1}";
-
-	private static final String VOL_ID = "volunteerID";
-	private static final String VOL_EMAIL = "email";
-	private static final String VOL_PASSWORD = "password";
-	private static final String VOL_FNAME = "fName";
-	private static final String VOL_LNAME = "lName";
-	private static final String VOL_ADDRESS = "address";
-	private static final String VOL_BIRTHDATE = "birthDate";
-	private static final String VOL_PROFILEPIC = "profilePic";
-
+	
+	//ORGANIZATION
+	// columns
+	private static final String ORG_ID = "organizationID";
+	private static final String ORG_NAME = "organizationName";
+	private static final String ORG_ADDRESS = "address";
+	private static final String ORG_EMAIL = "email";
+	private static final String ORG_PASSWORD = "password";
+	private static final String ORG_ORGPIC = "orgPic";
 	private static final String IS_DELETE = "delete";
+	// ex. when fail
 	public static final int DB_RETRY_TIMES = 5;
 
 	public void init(ServletConfig config) throws ServletException {
@@ -76,29 +72,22 @@ public class WebVolManageServlet extends HttpServlet {
 		Connection conn = null;
 
 		/**
-		 * private static final String VOL_ID = "volunteerID"; private static
-		 * final String VOL_EMAIL = "email"; private static final String
-		 * VOL_PASSWORD = "password"; private static final String VOL_FNAME =
-		 * "fName"; private static final String VOL_LNAME = "lName"; private
-		 * static final String VOL_ADDRESS = "address"; private static final
-		 * String VOL_BIRTHDATE = "birthDate"; private static final String
-		 * VOL_PROFILEPIC = "profilePic";
+		 * organization fields
 		 */
-		String volID = null;
-		String email = null;
-		String fName = null;
-		String lName = null;
-		String address = null;
-		String birthDate = null;
 		
-		String password = null;		
+		String organizationId=null;
+		String organizationName = null;
+		String address = null;
+		String email = null;
+		String password = null;
+		
 		boolean isDelete = false;
 		String fileName = null;
-		byte[] image = null;
+		byte[] orgPic = null;
 		String respPage = RESOURCE_FAIL_TAG;
 		try {
 
-			System.out.println("=======VOl Servlet =======");
+			System.out.println("=======Org Servlet =======");
 			// Parse the incoming HTTP request
 			// Commons takes over incoming request at this point
 			// Get an iterator for all the data that was sent
@@ -126,20 +115,17 @@ public class WebVolManageServlet extends HttpServlet {
 
 					System.out.println(fieldname + "=" + fieldvalue);
 					
-					if (fieldname.equals(VOL_ID)) {
-						volID = fieldvalue;
-					} else if (fieldname.equals(VOL_EMAIL)) {
-						email = fieldvalue;
-					} else if (fieldname.equals(VOL_FNAME)) {
-						fName = fieldvalue;
-					} else if (fieldname.equals(VOL_LNAME)) {
-						lName = fieldvalue;
-					} else if (fieldname.equals(VOL_ADDRESS)) {
+				
+					if (fieldname.equals(ORG_ID)) {
+						organizationId = fieldvalue;
+					} else if (fieldname.equals(ORG_NAME)) {
+						organizationName = fieldvalue;
+					} else if (fieldname.equals(ORG_ADDRESS)) {
 						address = fieldvalue;
-					} else if (fieldname.equals(VOL_PASSWORD)) {
-						password = fieldvalue;					
-					} else if (fieldname.equals(VOL_BIRTHDATE)) {
-						birthDate = fieldvalue;
+					} else if (fieldname.equals(ORG_EMAIL)) {
+						email = fieldvalue;
+					} else if (fieldname.equals(ORG_PASSWORD)) {
+						password = fieldvalue;
 					
 					}else if (fieldname.equals(IS_DELETE)) {
 
@@ -150,7 +136,7 @@ public class WebVolManageServlet extends HttpServlet {
 				} else {
 
 					fileName = item.getName();
-					image = item.get();
+					orgPic = item.get();
 
 				}
 			}
@@ -161,32 +147,32 @@ public class WebVolManageServlet extends HttpServlet {
 
 					conn = ConnPool.getInstance().getConnection();
 
-					VolunteerResProvider volProvider = new VolunteerResProvider();
+					OrganizationResProvider orgProvider = new OrganizationResProvider();
 					
-					java.util.Date date = FilesUtils.getDateFromString(birthDate);
-										
-					Volunteer vol = new Volunteer(fName, lName, date, address, email, password, image);
-					
+					//Date date = FilesUtils.getDateTimeFromString(birthDate);
+				
+					Organization org = new Organization( organizationName,  address, 
+    		 email,  password, orgPic);
 					
 					if (isDelete) {
 
-						if(volProvider.deleteVolunteer(vol, conn)){
+						if(orgProvider.deleteOrganization(org, conn)){
 							respPage = RESOURCE_SUCCESS_TAG;
 						}
 					
 
 					} else {
-			
+				
 						
-						if (volProvider.insertVolunteer(vol, conn)) {
+						if (orgProvider.insertOrganization(org, conn)) {
 							respPage = RESOURCE_SUCCESS_TAG;
 						}
 
 					}
 
-					/*if (image != null && image.length > 0) {
+					/*if (orgPic != null && orgPic.length > 0) {
 
-						FilesUtils.writeLocalCopy(fileName, image, false);
+						FilesUtils.writeLocalCopy(fileName, orgPic, false);
 					}*/
 
 					retry = 0;

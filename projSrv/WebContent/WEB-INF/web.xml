@@ -63,4 +63,26 @@
 		<url-pattern>/web_vol_manage</url-pattern>
 	</servlet-mapping>
 	
+	<servlet>
+		<description></description>
+		<display-name>WebOrgManageServlet</display-name>
+		<servlet-name>WebOrgManageServlet</servlet-name>
+		<servlet-class>com.haifa.servlets.WebOrgManageServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>WebOrgManageServlet</servlet-name>
+		<url-pattern>/web_org_manage</url-pattern>
+	</servlet-mapping>
+	
+		<servlet>
+		<description></description>
+		<display-name>WebVolEventManageServlet</display-name>
+		<servlet-name>WebVolEventManageServlet</servlet-name>
+		<servlet-class>com.haifa.servlets.WebVolEventManageServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>WebVolEventManageServlet</servlet-name>
+		<url-pattern>/web_volevent_manage</url-pattern>
+	</servlet-mapping>
+	
 </web-app>

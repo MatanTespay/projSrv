@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Date;
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 
 import javax.xml.bind.DatatypeConverter;
@@ -104,22 +105,55 @@ public class FilesUtils {
      return (date != null) ? new Date(date.getTime()) : null;
     }
     
-    public static Date getDateTimeFromString(String dateString){
-        Date date = null;
+    public static Date getTimeStemp(Date date){
+    	
+    	return null;
+    	
+    }
+   
+    
+    public static java.util.Date getDateTimeFromString(String dateString){
+    	java.util.Date  date = null;
+       // Timestamp ts;
         try {
                 if(dateString != null && !dateString.equals(""))
-                date =  java.sql.Date.valueOf(dateString);
+                {
+            		 //ts = Timestamp.valueOf(dateString);
+                	//date =  java.sql.Date.valueOf(dateString);
+                	date = longformatter.parse(dateString);
+                }
                 
         }catch(Throwable t) {
             t.printStackTrace();
         }
-
         return  date;
     }
     
-    public static String getDateString(java.util.Date date){
+    public static java.util.Date getDateFromString(String dateString){
+    	java.util.Date  date = null;
+       // Timestamp ts;
+        try {
+                if(dateString != null && !dateString.equals(""))
+                {
+            		 //ts = Timestamp.valueOf(dateString);
+                	//date =  java.sql.Date.valueOf(dateString);
+                	date = sortformatter.parse(dateString);
+                }
+                
+        }catch(Throwable t) {
+            t.printStackTrace();
+        }
+        return  date;
+    }
+    public static String getShortDateString(java.util.Date date){
     	
     	String dateFormatted = sortformatter.format(date);
     	return dateFormatted;
     }
+    
+    public static String getLongDateString(java.util.Date date){
+    	String stringFormatted = longformatter.format(date);
+    	return stringFormatted;
+    }
+    
 }

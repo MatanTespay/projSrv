@@ -3,6 +3,8 @@ package com.haifa.objects;
 import java.util.Date;
 import java.util.List;
 
+import com.haifa.utils.FilesUtils;
+
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
@@ -18,8 +20,10 @@ public class VolEvent {
     private String details;
     private String title;
 
-    public VolEvent( int volEventID, int volID,int orgID, Date date,String details,  Date startTime, Date endTime, String title ) {
-        this.details = details;
+    public VolEvent( int volEventID, int volID,int orgID, Date date,String details,
+    		Date startTime, Date endTime, String title ) {
+        this.volEventID =volEventID;
+    	this.details = details;
         this.date = date;
         this.startTime = startTime;
         this.endTime = endTime;
@@ -27,7 +31,12 @@ public class VolEvent {
         this.title = title;
         this.orgID=orgID;
     }
+    public VolEvent(  int volID,int orgID, Date date,String details,  Date startTime, Date endTime, String title ) {
+        this(0,  volID, orgID,  date, details,
+        		 startTime,  endTime,  title);
+    }
 
+    
     public VolEvent() {
 
     }
@@ -109,9 +118,9 @@ public class VolEvent {
     		iObj.put("eventID", getVolEventID());
     		iObj.put("volunteerID", getVolID());
     		iObj.put("organizationID", getOrgID());
-    		iObj.put("date", (getDate()==null? "":getDate()));
-    		iObj.put("startTime", (getStartTime()==null? "":getStartTime()));
-    		iObj.put("endTime",  (getEndTime()==null? "":getEndTime()));
+    		iObj.put("date", (getDate() != null ) ? FilesUtils.getShortDateString(getDate()) : "");
+    		iObj.put("startTime", (getStartTime() != null ) ? FilesUtils.getLongDateString(getStartTime()) : "");
+    		iObj.put("endTime",  (getEndTime() != null ) ? FilesUtils.getLongDateString(getEndTime()) : "");
     		iObj.put("details", getDetails());
     		iObj.put("title", getTitle());
     		return iObj;

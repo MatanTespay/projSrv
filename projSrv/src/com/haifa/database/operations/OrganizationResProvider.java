@@ -17,9 +17,13 @@ import com.haifa.objects.Volunteer;
 public class OrganizationResProvider {
 
 	// update organization query
-	private static final String update_sql = "UPDATE  organization  SET   organizationName  = ?,  address  = ?,  email  = ?,  password  ?,  orgPic  = ? WHERE  organizationID  = ?;";
+	private static final String update_sql = "UPDATE  organization  SET   organizationName  = ?,  address  = ?,   password = ?,  orgPic  = ? WHERE  organizationID  = ?;";
 	// select organization by chosen org query 
 	private static final String select_sql = "SELECT * FROM  organization WHERE organizationID = ?;";
+	
+	// select organization by chosen email org query 
+		private static final String selectEmail_sql = "SELECT * FROM  organization WHERE email = ?;";
+		
 	// select  all organizations query
 	private static final String selectAll_sql = "SELECT * FROM  organization;";
 	// insert org query
@@ -139,31 +143,36 @@ public class OrganizationResProvider {
 			}	
 	
 			// get the Organization in db that the id is org.getID
-			stt = (PreparedStatement) conn.prepareStatement(select_sql);
+			stt = (PreparedStatement) conn.prepareStatement(selectEmail_sql);
 			//where
-			stt.setInt(1, id);
+			stt.setString(1, email);
 			
 			if (stt.execute()) {
 				rs1 = stt.getResultSet();
 				if (rs1.next()) {
 					// its execute update
+					
 					ps = (PreparedStatement) conn.prepareStatement(update_sql);
-
+					//get the existing id
+					id = rs1.getInt("organizationID");
+					ps.setInt(5, id);
 					ps.setString(1, name);
 					ps.setString(2, address);
-					ps.setString(3, email);
-					ps.setString(4, password);
+					ps.setString(3, password);
 					if (profilePic != null) {
 						InputStream is = new ByteArrayInputStream(profilePic);
-						ps.setBlob(5, is);
+						ps.setBlob(4, is);
 
 					} else {
 
-						ps.setNull(5, Types.BLOB);
+						ps.setNull(4, Types.BLOB);
 					}
 					
 					
-					result = ps.execute();
+					
+					ps.execute();
+					result = true;
+					
 				} else {
 
 					// its execute insert
@@ -181,8 +190,8 @@ public class OrganizationResProvider {
 
 						ps.setNull(5, Types.BLOB);
 					}
-					result = ps.execute();
-					//result = true;
+					ps.execute();
+					result = true;
 
 				}
 			}
@@ -257,6 +266,7 @@ public byte[] getImage(int orgId, Connection conn)
 			java.sql.Blob imageBlob = rs.getBlob(1);
 			if (imageBlob != null) {
 				result = imageBlob.getBytes(1, (int) imageBlob.length());
+				
 			}
 		}
 
@@ -288,26 +298,32 @@ public byte[] getImage(int orgId, Connection conn)
 	return result;
 }
 
-	public boolean deleteVolunteer(Organization org, Connection conn) throws SQLException {
+	public boolean deleteOrganization(Organization org, Connection conn) throws SQLException {
 
 		boolean result = false;
 		PreparedStatement ps = null;
+		ResultSet rs1 = null;
+		PreparedStatement stt = null;
 		try {
 
-			if (org != null) {
-				
-				int id = org.getId();
+			// get the Organization in db that the id is org.getID
+						stt = (PreparedStatement) conn.prepareStatement(selectEmail_sql);
+						//where
+						stt.setString(1, org.getEmail());
 						
+						if (stt.execute()) {
+							rs1 = stt.getResultSet();
+							if (rs1.next()) {
+								// its execute update
+								ps = (PreparedStatement) conn.prepareStatement(delete_sql);
+								//get the existing id
+								int id = rs1.getInt("organizationID");
+								ps.setInt(1, id);
+								 ps.execute();
 
-				ps = (PreparedStatement) conn.prepareStatement(delete_sql);
-
-			//delete the recored
-				ps.setInt(1, id);
-				
-				ps.execute();
-
-				result = true;
-			}
+									result = true;
+							}
+						}
 
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -325,4 +341,6 @@ public byte[] getImage(int orgId, Connection conn)
 
 		return result;
 	}
+
+
 }

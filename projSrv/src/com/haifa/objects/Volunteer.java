@@ -26,14 +26,9 @@ public class Volunteer {
 
     public Volunteer(String fName, String lName, Date birthDate, String address, String email , String password,
     		byte[] profilePic){
-        this.fName = fName;
-        this.lName =lName;
-        this.birthDate =birthDate;
-        this.address = address;
-        this.email = email;
-        this.password = password;
-        this.profilePic =profilePic;
-        //this.volEvents=new ArrayList<>();
+    	this(0,  fName,  lName,  birthDate,  address,  email ,  password,
+        		profilePic);
+
     }
 
     public Volunteer() {
@@ -46,7 +41,6 @@ public class Volunteer {
         this.lName =lName;
         this.birthDate =birthDate;
         this.address = address;
-
         this.email = email;
         this.profilePic = profilePic;
         this.password = password;
@@ -132,7 +126,7 @@ public class Volunteer {
     		iObj.put("fname", getfName());
     		iObj.put("lname", getlName());
     		
-    		iObj.put("birthDate", (getBirthDate() != null ) ? FilesUtils.getDateString(getBirthDate()) : "");
+    		iObj.put("birthDate", (getBirthDate() != null ) ? FilesUtils.getShortDateString(getBirthDate()) : "");
     		iObj.put("address", getAddress());
     		iObj.put("email", getEmail());
     		iObj.put("password", getPassword());    	

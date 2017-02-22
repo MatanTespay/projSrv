@@ -17,7 +17,13 @@ public class Organization {
     private String password;
     private byte[] profilePic;
 
-
+    public Organization( String name, String address, 
+    		String email, String password, byte[] profilePic){
+    	this(0 ,  name,  address, 
+        		 email,  password,  profilePic);
+    
+    }
+    
     public Organization(int id , String name, String address, 
     		String email, String password, byte[] profilePic){
         this.id =id;
