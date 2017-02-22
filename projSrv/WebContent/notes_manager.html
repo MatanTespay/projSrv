@@ -3,6 +3,45 @@
 <head>
 <meta charset="utf-8">
 <title>My Notes</title>
+<script src="jquery-3.1.1.min.js"></script>
+<script type="text/javascript">
+
+function getScreenTime(){
+	debugger;
+	var userID, screenId;
+	userId = $("#userID").val();
+	screenId = $("#screenID").val();
+	
+	if(userId !== "" && screenId !== ""){
+		 $.ajax({
+			 	type: 'POST',
+			 	data: { 
+			        'userId': userId, 
+			        'screenId':screenId ,
+			        'req':11 ,
+			        
+			    }, 
+			    url:"projres",  
+			    success:function(data) {
+			      handleData(data); 
+			    }
+		});
+	}
+
+	
+}
+
+function handleData(returnedData) {
+	if(returnedData != null){
+		alert(returnedData)
+	}
+	else{
+		alert("error");
+	}
+	 
+}
+
+</script>
 </head>
 <body>
 
@@ -115,6 +154,17 @@
   		<input type="submit" name="submit" value="ok">
   		
 </form>
+
+<h1>GET SCREEN TIME</h1>
+<label> 
+		VolunteerID: <input type="text"  id="userID" /> <br /> <br />
+		</label> 
+        <label> 
+		    ScreenID: <input type="text" id="screenID" /> <br /> <br />
+		</label> 
+<button type="button"
+onclick="getScreenTime()">Get Screen Time
+</button>
 <!--END VOLEVENT -->
 <!--image-->
 <!--

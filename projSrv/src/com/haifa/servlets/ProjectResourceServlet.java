@@ -22,11 +22,13 @@ import com.haifa.database.operations.ConnPool;
 import com.haifa.database.operations.FoldersResProvider;
 import com.haifa.database.operations.ItemsResProvider;
 import com.haifa.database.operations.OrganizationResProvider;
+import com.haifa.database.operations.ScreenTimeResProvider;
 import com.haifa.database.operations.VolEventResProvider;
 import com.haifa.database.operations.VolunteerResProvider;
 import com.haifa.objects.Folder;
 import com.haifa.objects.Item;
 import com.haifa.objects.Organization;
+import com.haifa.objects.ScreenTime;
 import com.haifa.objects.VolEvent;
 import com.haifa.objects.Volunteer;
 import com.haifa.utils.FilesUtils;
@@ -47,6 +49,7 @@ public class ProjectResourceServlet extends HttpServlet {
 	private static final int GET_ITEM_IMAGE_REQ = 5;
 	private static final int GET_ITEMS_OF_FOLDER_JSON_REQ = 6;
 	private static final int GET_FILE_FROM_FILESYSTEM_REQ = 7;
+
 	// requserts numbers
 	
 	
@@ -97,6 +100,18 @@ public class ProjectResourceServlet extends HttpServlet {
 	private static final String ITEM_FOLDER_ID = "it_fid";
 	private static final String FILE_NAME ="name";
 
+	/**
+	 * STATISTICS, screen object 
+	 */
+	private static final int GET_SCREENTIME_REQ = 11;
+	private static final String SCREEN_TIME_ID = "ID";
+	private static final String SCREEN_USERID = "userID";
+	private static final String SCREEN_ID = "screenID";
+	private static final String SCREEN_DATE = "date";
+	private static final String SCREEN_DURATION = "duration";
+	
+	
+	
 	private static final String REQ = "req";
 
 	public static final int DB_RETRY_TIMES = 5;
@@ -361,6 +376,30 @@ public class ProjectResourceServlet extends HttpServlet {
 						retry = 0;
 						break;
 					}
+					case GET_SCREENTIME_REQ: {
+						String userID = req.getParameter("userId");
+					//	String screenID = req.getParameter("screenId");
+						
+						conn = ConnPool.getInstance().getConnection();
+						ScreenTimeResProvider screenProvider = new ScreenTimeResProvider();
+						int user = Integer.parseInt(userID);
+						List<ScreenTime> v_list = screenProvider.getUserScreenTime(user, conn);
+						String resultJson = ScreenTime.toJson(v_list);
+
+						if (resultJson != null && !resultJson.isEmpty()) {
+							respPage = resultJson;
+							resp.addHeader("Content-Type",
+									"application/json; charset=UTF-8");
+							PrintWriter pw = resp.getWriter();
+							pw.write(respPage);
+						} else {
+							resp.sendError(404);
+						}
+						
+
+						retry = 0;
+						break;
+					}
 					case GET_ORGANIZATIONS_REQ: {
 						
 						conn = ConnPool.getInstance().getConnection();
@@ -382,7 +421,6 @@ public class ProjectResourceServlet extends HttpServlet {
 						retry = 0;
 						break;
 					}
-
 					// == end items apis
 
 					default:
