@@ -14,15 +14,15 @@
   		
 </form>
 <br>
-<h3> ITEM INSERT/UPDATE/REMOVE OPERATIONS </h3> 
+<h3> Volunteer INSERT/UPDATE/REMOVE OPERATIONS </h3> 
 <form method="post" action="http://localhost:8080/projSrv/web_vol_manage?" name="submit" enctype="multipart/form-data">
  
   		<input type="checkbox" name="delete" value="true" >delete<br /><br />
 		<label> 
-		    email: <input type="text" name="fName" /> <br /> <br />
+		    email: <input type="text" name="email" /> <br /> <br />
 		</label> 
 		<label> 
-		    password: <input type="text" name="password" /> <br /> <br />
+		    password: <input type="password" name="password" /> <br /> <br />
 		</label> 
 		<label> 
 		   first name: <input type="text" name="fName" /> <br /> <br />
@@ -33,6 +33,9 @@
 		<label>
 			address: <input type="text"  name="address" /><br /> <br /> 
 		</label>		
+		<label>
+			birth Date: <input type="date"  name="birthDate" /><br /> <br /> 
+		</label>
   		<label>
   		    picture : <input type="file" name="profilePic"><br /><br />
   		</label>

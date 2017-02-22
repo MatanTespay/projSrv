@@ -90,7 +90,7 @@ public class WebVolManageServlet extends HttpServlet {
 		String lName = null;
 		String address = null;
 		String birthDate = null;
-		String imageString = null;
+		
 		String password = null;		
 		boolean isDelete = false;
 		String fileName = null;
@@ -140,10 +140,7 @@ public class WebVolManageServlet extends HttpServlet {
 						password = fieldvalue;					
 					} else if (fieldname.equals(VOL_BIRTHDATE)) {
 						birthDate = fieldvalue;
-					}
-					else if (fieldname.equals(VOL_PROFILEPIC)) {
-						//check for image
-						imageString = fieldvalue;
+					
 					}else if (fieldname.equals(IS_DELETE)) {
 
 						isDelete = Boolean.valueOf(fieldvalue);
@@ -168,7 +165,7 @@ public class WebVolManageServlet extends HttpServlet {
 					
 					Date date = FilesUtils.getDateTimeFromString(birthDate);
 					
-					Volunteer vol = new Volunteer(fName, lName, date, address, email, password, null);
+					Volunteer vol = new Volunteer(fName, lName, date, address, email, password, image);
 					
 					/*ItemsResProvider itemResProvider = new ItemsResProvider();
 					Item item = new Item(volID, email, fName, image, lName);*/
@@ -186,6 +183,7 @@ public class WebVolManageServlet extends HttpServlet {
 					/*	if (itemResProvider.insertItem(item, conn)) {
 							respPage = RESOURCE_SUCCESS_TAG;
 						}*/
+						
 						if (volProvider.insertVolunteer(vol, conn)) {
 							respPage = RESOURCE_SUCCESS_TAG;
 						}
