@@ -358,7 +358,6 @@ public class ProjectResourceServlet extends HttpServlet {
 							resp.sendError(404);
 						}
 						
-
 						retry = 0;
 						break;
 					}
