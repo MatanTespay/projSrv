@@ -179,8 +179,9 @@ public class VolEventResProvider {
 					ps.setString(7, title);
 					
 					
-					return  ps.execute();
-					//result = true;
+					 ps.execute();
+					 result = true;
+					
 
 				}
 			}

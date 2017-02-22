@@ -78,6 +78,7 @@ public class OrganizationResProvider {
 				if (imageBlob != null) {
 					profilePic = imageBlob.getBytes(1, (int) imageBlob.length());
 				}
+				
 				Organization org = new Organization(id, name, address, email, password, profilePic);
 		
 					
