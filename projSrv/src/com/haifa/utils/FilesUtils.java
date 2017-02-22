@@ -14,6 +14,7 @@ import javax.xml.bind.DatatypeConverter;
 public class FilesUtils {
 
 	 private static SimpleDateFormat longformatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	 private static SimpleDateFormat sortformatter = new SimpleDateFormat("yyyy-MM-dd");
 	 
 	public static String appDirName = "";
 
@@ -107,7 +108,7 @@ public class FilesUtils {
         Date date = null;
         try {
                 if(dateString != null && !dateString.equals(""))
-                date = (Date) longformatter.parse(dateString);
+                date =  java.sql.Date.valueOf(dateString);
                 
         }catch(Throwable t) {
             t.printStackTrace();
@@ -116,5 +117,9 @@ public class FilesUtils {
         return  date;
     }
     
-    
+    public static String getDateString(java.util.Date date){
+    	
+    	String dateFormatted = sortformatter.format(date);
+    	return dateFormatted;
+    }
 }

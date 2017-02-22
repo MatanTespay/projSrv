@@ -20,7 +20,7 @@ import com.haifa.utils.FilesUtils;
 
 public class VolunteerResProvider {
 
-	private static final String update_sql = "UPDATE volunteer SET  volunteerID =? ,email = ?, password = ?, fName = ?, lName = ? , address =? , birthDate = ?, profilePic = ? WHERE volunteerID = ?;";
+	private static final String update_sql = "UPDATE volunteer SET  email = ?, password = ?, fName = ?, lName = ? , address =? , birthDate = ?, profilePic = ? WHERE volunteerID = ?;";
 
 	private static final String select_sql = "SELECT * FROM  volunteer WHERE volunteerID = ?;";
 	
@@ -28,7 +28,7 @@ public class VolunteerResProvider {
 
 	private static final String insert_sql = "INSERT INTO volunteer (email, password , fName , lName , address  , birthDate, profilePic ) VALUES (?, ?, ?, ?, ?, ?, ?);";
 
-	private static final String select_img_sql = "SELECT image FROM  volunteer WHERE volunteerID = ?;";
+	private static final String select_img_sql = "SELECT profilePic FROM  volunteer WHERE volunteerID = ?;";
 	
 	private static final String delete_sql = "DELETE FROM volunteer WHERE volunteerID = ? ;";
 
@@ -154,45 +154,45 @@ public class VolunteerResProvider {
 				if (rs1.next()) {
 					// its execute update
 					ps = (PreparedStatement) conn.prepareStatement(update_sql);
-					ps.setString(2, email);
-					ps.setString(3, password);
-					ps.setString(4, fName);
-					ps.setString(5, lName);
-					ps.setString(6, address);
-					ps.setDate(7, FilesUtils. toSqlDate(birthDate));
+					ps.setString(1, email);
+					ps.setString(2, password);
+					ps.setString(3, fName);
+					ps.setString(4, lName);
+					ps.setString(5, address);
+					ps.setDate(6, FilesUtils. toSqlDate(birthDate));
 					if (profilePic != null) {
 						InputStream is = new ByteArrayInputStream(profilePic);
-						ps.setBlob(8, is);
+						ps.setBlob(7, is);
 
 					} else {
 
-						ps.setNull(8, Types.BLOB);
+						ps.setNull(7, Types.BLOB);
 					}
 					
-					return ps.execute();
-					//result = true;
+				 ps.execute();
+				result = true;
 				} else {
 
 					// its execute insert
 					ps = (PreparedStatement) conn.prepareStatement(insert_sql);
 					//ps.setInt(1,id);
-					ps.setString(2, email);
-					ps.setString(3, password);
-					ps.setString(4, fName);
-					ps.setString(5, lName);
-					ps.setString(6, address);
-					ps.setDate(7, FilesUtils. toSqlDate(birthDate));
+					ps.setString(1, email);
+					ps.setString(2, password);
+					ps.setString(3, fName);
+					ps.setString(4, lName);
+					ps.setString(5, address);
+					ps.setDate(6, FilesUtils. toSqlDate(birthDate));
 					if (profilePic != null) {
 						InputStream is = new ByteArrayInputStream(profilePic);
-						ps.setBlob(8, is);
+						ps.setBlob(7, is);
 
 					} else {
 
-						ps.setNull(8, Types.BLOB);
+						ps.setNull(7, Types.BLOB);
 					}
 					
-					return  ps.execute();
-					//result = true;
+				    ps.execute();
+					result = true;
 
 				}
 			}

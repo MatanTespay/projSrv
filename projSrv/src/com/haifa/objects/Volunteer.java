@@ -131,7 +131,8 @@ public class Volunteer {
     		iObj.put("volID", getId());
     		iObj.put("fname", getfName());
     		iObj.put("lname", getlName());
-    		iObj.put("birthDate", getBirthDate());
+    		
+    		iObj.put("birthDate", (getBirthDate() != null ) ? FilesUtils.getDateString(getBirthDate()) : "");
     		iObj.put("address", getAddress());
     		iObj.put("email", getEmail());
     		iObj.put("password", getPassword());    	
