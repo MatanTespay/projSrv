@@ -180,7 +180,6 @@ public class Volunteer {
     			}
 
     		}
-
     		jsonObj.put("volunteers", jsonArray);
 
     		return jsonObj.toString(2);
