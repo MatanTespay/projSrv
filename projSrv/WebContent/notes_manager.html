@@ -61,7 +61,8 @@ function handleData(returnedData) {
 			addTable(returnedData["volunteers"], "volunteers" , ["volID","fname",  "lname","birthDate","address","email","password","ProfilePic" ])
 		}
 		else if(typeof returnedData !== "undefined" && returnedData["organizations"] !== null){
-			addTable(returnedData["volunteers"], "volunteers" , ["volID","fname",  "lname","birthDate","address","email","password","ProfilePic" ])
+			
+			addTable(returnedData["organizations"], "organizations" , ["organizationID","organizationName",  "Address","Email","Password","ProfilePic" ])
 		}
 		
 	}
