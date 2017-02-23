@@ -18,10 +18,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import net.sf.json.JSONObject;
-import net.sf.json.util.JSONTokener;
-import jdk.nashorn.api.scripting.JSObject;
-
 import com.haifa.database.operations.ConnPool;
 import com.haifa.database.operations.FoldersResProvider;
 import com.haifa.database.operations.ItemsResProvider;
@@ -157,6 +153,69 @@ public class ProjectResourceServlet extends HttpServlet {
 
 					switch (reqNo) {
 
+					// == folder apis
+					case GET_ALL_FOLDERS_JSON_REQ: {
+
+						conn = ConnPool.getInstance().getConnection();
+						FoldersResProvider foldersResProvider = new FoldersResProvider();
+						List<Folder> foldersList = foldersResProvider
+								.getAllFolders(conn);
+						String resultJson = Folder.toJson(foldersList);
+
+						if (resultJson != null && !resultJson.isEmpty()) {
+							respPage = resultJson;
+							resp.addHeader("Content-Type",
+									"application/json; charset=UTF-8");
+							PrintWriter pw = resp.getWriter();
+							pw.write(respPage);
+						} else {
+							resp.sendError(404);
+						}
+
+						retry = 0;
+						break;
+					}
+
+					case INSERT_FOLDER_REQ: {
+						String id = req.getParameter(FOLDER_ID);
+						String title = req.getParameter(FOLDER_TITLE);
+						respPage = RESOURCE_FAIL_TAG;
+						resp.addHeader("Content-Type",
+								"application/json; charset=UTF-8");
+						conn = ConnPool.getInstance().getConnection();
+						FoldersResProvider foldersResProvider = new FoldersResProvider();
+
+						Folder folder = new Folder(id, title);
+						if (foldersResProvider.insertFolder(folder, conn)) {
+							respPage = RESOURCE_SUCCESS_TAG;
+						}
+						PrintWriter pw = resp.getWriter();
+						pw.write(respPage);
+
+						retry = 0;
+						break;
+					}
+
+					case DELETE_FOLDER_REQ: {
+						String id = req.getParameter(FOLDER_ID);
+						respPage = RESOURCE_FAIL_TAG;
+						resp.addHeader("Content-Type",
+								"application/json; charset=UTF-8");
+						conn = ConnPool.getInstance().getConnection();
+						FoldersResProvider foldersResProvider = new FoldersResProvider();
+
+						Folder folder = new Folder(id);
+						if (foldersResProvider.deleteFolder(folder, conn)) {
+							respPage = RESOURCE_SUCCESS_TAG;
+						}
+						PrintWriter pw = resp.getWriter();
+						pw.write(respPage);
+
+						retry = 0;
+						break;
+					}
+					// == end folder apis
+
 					// == item apis
 					case INSERT_ITEM_REQ: {
 						String id = req.getParameter(ITEM_ID);
@@ -215,7 +274,68 @@ public class ProjectResourceServlet extends HttpServlet {
 						retry = 0;
 						break;
 					}
+
+					case GET_ITEMS_OF_FOLDER_JSON_REQ: {
+
+						String id = req.getParameter(FOLDER_ID);
+						conn = ConnPool.getInstance().getConnection();
+						ItemsResProvider itemsResProvider = new ItemsResProvider();
+						Folder folder = new Folder(id);
+						List<Item> itemsList = itemsResProvider.getAllItems(
+								folder, conn);
+						String resultJson = Item.toJson(itemsList);
+
+						if (resultJson != null && !resultJson.isEmpty()) {
+							respPage = resultJson;
+							resp.addHeader("Content-Type",
+									"application/json; charset=UTF-8");
+							PrintWriter pw = resp.getWriter();
+							pw.write(respPage);
+						} else {
+							resp.sendError(404);
+						}
+
+						retry = 0;
+						break;
+					}
+
+					case GET_ITEM_IMAGE_REQ: {
+						String id = req.getParameter(ITEM_ID);
+						respPage = RESOURCE_FAIL_TAG;
+
+						conn = ConnPool.getInstance().getConnection();
+						ItemsResProvider itemsResProvider = new ItemsResProvider();
+
+						byte[] imgBlob = itemsResProvider.getImage(id, conn);
+
+						if (imgBlob != null && imgBlob.length > 0) {
+							ServletOutputStream os = resp.getOutputStream();
+							os.write(imgBlob);
+						} else {
+							resp.sendError(404);
+						}
+
+						retry = 0;
+						break;
+					}
 					
+					case GET_FILE_FROM_FILESYSTEM_REQ: {
+						String fileName = req.getParameter(FILE_NAME);
+						
+						File file = new File(FilesUtils.appDirName,fileName);
+						
+						byte[] blob = FilesUtils.getLocalCopy(file);
+
+						if (blob != null && blob.length > 0) {
+							ServletOutputStream os = resp.getOutputStream();
+							os.write(blob);
+						} else {
+							resp.sendError(404);
+						}
+
+						retry = 0;
+						break;
+					}
 					case GET_VOLUNTEERS_REQ: {
 					
 						conn = ConnPool.getInstance().getConnection();
@@ -301,39 +421,6 @@ public class ProjectResourceServlet extends HttpServlet {
 
 						retry = 0;
 						break;
-					}
-					case UPDATE_ORG_REQ : {
-						
-						respPage = RESOURCE_FAIL_TAG;
-						resp.addHeader("Content-Type",
-								"application/json; charset=UTF-8");
-						
-						conn = ConnPool.getInstance().getConnection();
-						
-						Organization org = new Organization();
-						
-						OrganizationResProvider orgProvider = new OrganizationResProvider();
-						
-						String data  = req.getParameter("data");	
-						
-						JSONTokener jsonTokener = new JSONTokener(data);
-
-			            JSONObject json = (JSONObject) jsonTokener.nextValue();
-			            
-											
-						if(org.fromJson(json)){
-			
-								if (orgProvider.insertOrganization(org, conn)) {
-									respPage = RESOURCE_SUCCESS_TAG;									
-								}							
-						}									
-
-						PrintWriter pw = resp.getWriter();
-						pw.write(respPage);
-						
-						retry = 0;
-						break;
-						
 					}
 					// == end items apis
 

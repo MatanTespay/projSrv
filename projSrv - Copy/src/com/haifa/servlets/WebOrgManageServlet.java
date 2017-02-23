@@ -14,9 +14,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import net.sf.json.JSONObject;
-import net.sf.json.util.JSONTokener;
-
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
 import org.apache.commons.fileupload.FileUploadException;
@@ -83,8 +80,7 @@ public class WebOrgManageServlet extends HttpServlet {
 		String address = null;
 		String email = null;
 		String password = null;
-		boolean isReqFromApp = false;
-		String dataFromApp = null;
+		
 		boolean isDelete = false;
 		String fileName = null;
 		byte[] orgPic = null;
@@ -119,15 +115,8 @@ public class WebOrgManageServlet extends HttpServlet {
 
 					System.out.println(fieldname + "=" + fieldvalue);
 					
-					if (fieldname.equals("data")) { // a request from app to with object
-						isReqFromApp = true;	
-						dataFromApp = fieldvalue;						
-					}
-					else if (fieldname.equals("req")) {
-						isDelete = fieldvalue.equals("15"); //request code for delete from app
-					}
-					//request from web
-					else if (fieldname.equals(ORG_ID)) {
+				
+					if (fieldname.equals(ORG_ID)) {
 						organizationId = fieldvalue;
 					} else if (fieldname.equals(ORG_NAME)) {
 						organizationName = fieldvalue;
@@ -141,7 +130,7 @@ public class WebOrgManageServlet extends HttpServlet {
 					}else if (fieldname.equals(IS_DELETE)) {
 
 						isDelete = Boolean.valueOf(fieldvalue);
-					
+
 					}
 
 				} else {
@@ -157,51 +146,35 @@ public class WebOrgManageServlet extends HttpServlet {
 				try {
 
 					conn = ConnPool.getInstance().getConnection();
+
 					OrganizationResProvider orgProvider = new OrganizationResProvider();
-					Organization org= new Organization();
 					
-					if(!isReqFromApp){
-						 org = new Organization( organizationName,  address, email,  password, orgPic);
-							if (isDelete) {
-
-								if(orgProvider.deleteOrganization(org, conn)){
-									respPage = RESOURCE_SUCCESS_TAG;
-								}
-							
-
-							} else {
-						
-								
-								if (orgProvider.insertOrganization(org, conn)) {
-									respPage = RESOURCE_SUCCESS_TAG;
-								}
-
-							}
-					}
-					else{
-						JSONTokener jsonTokener = new JSONTokener(dataFromApp);
-
-			            JSONObject json = (JSONObject) jsonTokener.nextValue();
-			            
-						
-						if (org.fromJson(json)) {
-							if (isDelete) {
-
-								if(orgProvider.deleteOrganization(org, conn)){
-									respPage = RESOURCE_SUCCESS_TAG;
-								}
-							
-
-							} else {
-								if (orgProvider.insertOrganization(org, conn)) {
-									respPage = RESOURCE_SUCCESS_TAG;
-								}
-
-							}
-						
-						}					
-					}
+					//Date date = FilesUtils.getDateTimeFromString(birthDate);
 				
+					Organization org = new Organization( organizationName,  address, 
+    		 email,  password, orgPic);
+					
+					if (isDelete) {
+
+						if(orgProvider.deleteOrganization(org, conn)){
+							respPage = RESOURCE_SUCCESS_TAG;
+						}
+					
+
+					} else {
+				
+						
+						if (orgProvider.insertOrganization(org, conn)) {
+							respPage = RESOURCE_SUCCESS_TAG;
+						}
+
+					}
+
+					/*if (orgPic != null && orgPic.length > 0) {
+
+						FilesUtils.writeLocalCopy(fileName, orgPic, false);
+					}*/
+
 					retry = 0;
 
 				} catch (SQLException e) {

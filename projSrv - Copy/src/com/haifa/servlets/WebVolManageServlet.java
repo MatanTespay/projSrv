@@ -14,9 +14,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import net.sf.json.JSONObject;
-import net.sf.json.util.JSONTokener;
-
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
 import org.apache.commons.fileupload.FileUploadException;
@@ -24,29 +21,33 @@ import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 
 import com.haifa.database.operations.ConnPool;
-import com.haifa.database.operations.OrganizationResProvider;
+import com.haifa.database.operations.ItemsResProvider;
 import com.haifa.database.operations.VolunteerResProvider;
-import com.haifa.objects.Organization;
+import com.haifa.objects.Item;
 import com.haifa.objects.Volunteer;
 import com.haifa.utils.FilesUtils;
 
-public class WebOrgManageServlet extends HttpServlet {
+/**
+ * Servlet implementation class WebItemsManageServlet
+ */
+
+public class WebVolManageServlet extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
 
 	private static final String RESOURCE_FAIL_TAG = "{\"result_code\":0}";
 	private static final String RESOURCE_SUCCESS_TAG = "{\"result_code\":1}";
-	
-	//ORGANIZATION
-	// columns
-	private static final String ORG_ID = "organizationID";
-	private static final String ORG_NAME = "organizationName";
-	private static final String ORG_ADDRESS = "address";
-	private static final String ORG_EMAIL = "email";
-	private static final String ORG_PASSWORD = "password";
-	private static final String ORG_ORGPIC = "orgPic";
+
+	private static final String VOL_ID = "volunteerID";
+	private static final String VOL_EMAIL = "email";
+	private static final String VOL_PASSWORD = "password";
+	private static final String VOL_FNAME = "fName";
+	private static final String VOL_LNAME = "lName";
+	private static final String VOL_ADDRESS = "address";
+	private static final String VOL_BIRTHDATE = "birthDate";
+	private static final String VOL_PROFILEPIC = "profilePic";
+
 	private static final String IS_DELETE = "delete";
-	// ex. when fail
 	public static final int DB_RETRY_TIMES = 5;
 
 	public void init(ServletConfig config) throws ServletException {
@@ -75,23 +76,29 @@ public class WebOrgManageServlet extends HttpServlet {
 		Connection conn = null;
 
 		/**
-		 * organization fields
+		 * private static final String VOL_ID = "volunteerID"; private static
+		 * final String VOL_EMAIL = "email"; private static final String
+		 * VOL_PASSWORD = "password"; private static final String VOL_FNAME =
+		 * "fName"; private static final String VOL_LNAME = "lName"; private
+		 * static final String VOL_ADDRESS = "address"; private static final
+		 * String VOL_BIRTHDATE = "birthDate"; private static final String
+		 * VOL_PROFILEPIC = "profilePic";
 		 */
-		
-		String organizationId=null;
-		String organizationName = null;
-		String address = null;
+		String volID = null;
 		String email = null;
-		String password = null;
-		boolean isReqFromApp = false;
-		String dataFromApp = null;
+		String fName = null;
+		String lName = null;
+		String address = null;
+		String birthDate = null;
+		
+		String password = null;		
 		boolean isDelete = false;
 		String fileName = null;
-		byte[] orgPic = null;
+		byte[] image = null;
 		String respPage = RESOURCE_FAIL_TAG;
 		try {
 
-			System.out.println("=======Org Servlet =======");
+			System.out.println("=======VOl Servlet =======");
 			// Parse the incoming HTTP request
 			// Commons takes over incoming request at this point
 			// Get an iterator for all the data that was sent
@@ -119,35 +126,31 @@ public class WebOrgManageServlet extends HttpServlet {
 
 					System.out.println(fieldname + "=" + fieldvalue);
 					
-					if (fieldname.equals("data")) { // a request from app to with object
-						isReqFromApp = true;	
-						dataFromApp = fieldvalue;						
-					}
-					else if (fieldname.equals("req")) {
-						isDelete = fieldvalue.equals("15"); //request code for delete from app
-					}
-					//request from web
-					else if (fieldname.equals(ORG_ID)) {
-						organizationId = fieldvalue;
-					} else if (fieldname.equals(ORG_NAME)) {
-						organizationName = fieldvalue;
-					} else if (fieldname.equals(ORG_ADDRESS)) {
-						address = fieldvalue;
-					} else if (fieldname.equals(ORG_EMAIL)) {
+					if (fieldname.equals(VOL_ID)) {
+						volID = fieldvalue;
+					} else if (fieldname.equals(VOL_EMAIL)) {
 						email = fieldvalue;
-					} else if (fieldname.equals(ORG_PASSWORD)) {
-						password = fieldvalue;
+					} else if (fieldname.equals(VOL_FNAME)) {
+						fName = fieldvalue;
+					} else if (fieldname.equals(VOL_LNAME)) {
+						lName = fieldvalue;
+					} else if (fieldname.equals(VOL_ADDRESS)) {
+						address = fieldvalue;
+					} else if (fieldname.equals(VOL_PASSWORD)) {
+						password = fieldvalue;					
+					} else if (fieldname.equals(VOL_BIRTHDATE)) {
+						birthDate = fieldvalue;
 					
 					}else if (fieldname.equals(IS_DELETE)) {
 
 						isDelete = Boolean.valueOf(fieldvalue);
-					
+
 					}
 
 				} else {
 
 					fileName = item.getName();
-					orgPic = item.get();
+					image = item.get();
 
 				}
 			}
@@ -157,51 +160,35 @@ public class WebOrgManageServlet extends HttpServlet {
 				try {
 
 					conn = ConnPool.getInstance().getConnection();
-					OrganizationResProvider orgProvider = new OrganizationResProvider();
-					Organization org= new Organization();
+
+					VolunteerResProvider volProvider = new VolunteerResProvider();
 					
-					if(!isReqFromApp){
-						 org = new Organization( organizationName,  address, email,  password, orgPic);
-							if (isDelete) {
+					java.util.Date date = FilesUtils.getDateFromString(birthDate);
+										
+					Volunteer vol = new Volunteer(fName, lName, date, address, email, password, image);
+					
+					
+					if (isDelete) {
 
-								if(orgProvider.deleteOrganization(org, conn)){
-									respPage = RESOURCE_SUCCESS_TAG;
-								}
-							
+						if(volProvider.deleteVolunteer(vol, conn)){
+							respPage = RESOURCE_SUCCESS_TAG;
+						}
+					
 
-							} else {
+					} else {
+			
 						
-								
-								if (orgProvider.insertOrganization(org, conn)) {
-									respPage = RESOURCE_SUCCESS_TAG;
-								}
+						if (volProvider.insertVolunteer(vol, conn)) {
+							respPage = RESOURCE_SUCCESS_TAG;
+						}
 
-							}
 					}
-					else{
-						JSONTokener jsonTokener = new JSONTokener(dataFromApp);
 
-			            JSONObject json = (JSONObject) jsonTokener.nextValue();
-			            
-						
-						if (org.fromJson(json)) {
-							if (isDelete) {
+					/*if (image != null && image.length > 0) {
 
-								if(orgProvider.deleteOrganization(org, conn)){
-									respPage = RESOURCE_SUCCESS_TAG;
-								}
-							
+						FilesUtils.writeLocalCopy(fileName, image, false);
+					}*/
 
-							} else {
-								if (orgProvider.insertOrganization(org, conn)) {
-									respPage = RESOURCE_SUCCESS_TAG;
-								}
-
-							}
-						
-						}					
-					}
-				
 					retry = 0;
 
 				} catch (SQLException e) {

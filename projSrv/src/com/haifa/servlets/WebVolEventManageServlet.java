@@ -14,6 +14,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import net.sf.json.JSONObject;
+import net.sf.json.util.JSONTokener;
+
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
 import org.apache.commons.fileupload.FileUploadException;
@@ -80,6 +83,9 @@ public class WebVolEventManageServlet extends HttpServlet {
 		String details = null;
 		String title = null;
 			
+		boolean isReqFromApp = false;
+		String dataFromApp = null;
+		
 		boolean isDelete = false;
 		//String fileName = null;
 		
@@ -114,8 +120,15 @@ public class WebVolEventManageServlet extends HttpServlet {
 
 					System.out.println(fieldname + "=" + fieldvalue);
 				
-					
-					if (fieldname.equals(VOLEVENT_ID)) {
+					if (fieldname.equals("data")) { // a request from app to with object
+						isReqFromApp = true;	
+						dataFromApp = fieldvalue;						
+					}
+					else if (fieldname.equals("req")) {
+						isDelete = fieldvalue.equals("15"); //request code for delete from app
+					}
+					//request from web
+					else if (fieldname.equals(VOLEVENT_ID)) {
 						eventID = fieldvalue;
 					} else if (fieldname.equals(VOLEVENT_VOLUNTEERID)) {
 						volunteerID = fieldvalue;
@@ -152,41 +165,53 @@ public class WebVolEventManageServlet extends HttpServlet {
 					conn = ConnPool.getInstance().getConnection();
 
 					VolEventResProvider volEventProvider = new VolEventResProvider();
-					
-			
-					
-					java.util.Date eventDate = FilesUtils.getDateFromString(date);
-					java.util.Date startEvent = FilesUtils.getDateTimeFromString(startTime);
-					java.util.Date endEvent = FilesUtils.getDateTimeFromString(endTime);
-					int vol=  Integer.parseInt(volunteerID);
-					int org=  Integer.parseInt(organizationID);
+					VolEvent volevent = new VolEvent();
+					if(!isReqFromApp){
+						java.util.Date eventDate = FilesUtils.getDateFromString(date);
+						java.util.Date startEvent = FilesUtils.getDateTimeFromString(startTime);
+						java.util.Date endEvent = FilesUtils.getDateTimeFromString(endTime);
+						int vol=  Integer.parseInt(volunteerID);
+						int org=  Integer.parseInt(organizationID);
 
-						
-					VolEvent volevent = new VolEvent( vol, org,
-							eventDate, details,   startEvent,  endEvent,  title);
-					
-					/*ItemsResProvider itemResProvider = new ItemsResProvider();
-					Item item = new Item(volID, email, fName, image, lName);*/
+							
+						volevent = new VolEvent( vol, org,
+								eventDate, details,   startEvent,  endEvent,  title);
 
-					if (isDelete) {
+						if (isDelete) {
 
-						if(volEventProvider.deleteVolEvent(volevent, conn)){
-							respPage = RESOURCE_SUCCESS_TAG;
+							if(volEventProvider.deleteVolEvent(volevent, conn)){
+								respPage = RESOURCE_SUCCESS_TAG;
+							}
+
+						} else {
+							if (volEventProvider.insertVolEvent(volevent, conn)) {
+								respPage = RESOURCE_SUCCESS_TAG;
+							}
+
 						}
-						/*if (itemResProvider.deleteItem(item, conn)) {
-							respPage = RESOURCE_SUCCESS_TAG;
-						}*/
+					}else{
+						JSONTokener jsonTokener = new JSONTokener(dataFromApp);
 
-					} else {
-					/*	if (itemResProvider.insertItem(item, conn)) {
-							respPage = RESOURCE_SUCCESS_TAG;
-						}*/
+			            JSONObject json = (JSONObject) jsonTokener.nextValue();
+			            
+			            if (volevent.fromJson(json)) {
+							if (isDelete) {
+
+								if(volEventProvider.deleteVolEvent(volevent, conn)){
+									respPage = RESOURCE_SUCCESS_TAG;
+								}
+							
+
+							} else {
+								if (volEventProvider.insertVolEvent(volevent, conn)) {
+									respPage = RESOURCE_SUCCESS_TAG;
+								}
+
+							}
 						
-						if (volEventProvider.insertVolEvent(volevent, conn)) {
-							respPage = RESOURCE_SUCCESS_TAG;
-						}
-
+						}				
 					}
+
 
 					
 					retry = 0;

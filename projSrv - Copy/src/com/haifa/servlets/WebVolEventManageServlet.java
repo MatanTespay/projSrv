@@ -14,9 +14,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import net.sf.json.JSONObject;
-import net.sf.json.util.JSONTokener;
-
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
 import org.apache.commons.fileupload.FileUploadException;
@@ -24,29 +21,28 @@ import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 
 import com.haifa.database.operations.ConnPool;
-import com.haifa.database.operations.OrganizationResProvider;
+import com.haifa.database.operations.VolEventResProvider;
 import com.haifa.database.operations.VolunteerResProvider;
-import com.haifa.objects.Organization;
+import com.haifa.objects.VolEvent;
 import com.haifa.objects.Volunteer;
 import com.haifa.utils.FilesUtils;
 
-public class WebOrgManageServlet extends HttpServlet {
-
+public class WebVolEventManageServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	private static final String RESOURCE_FAIL_TAG = "{\"result_code\":0}";
 	private static final String RESOURCE_SUCCESS_TAG = "{\"result_code\":1}";
-	
-	//ORGANIZATION
-	// columns
-	private static final String ORG_ID = "organizationID";
-	private static final String ORG_NAME = "organizationName";
-	private static final String ORG_ADDRESS = "address";
-	private static final String ORG_EMAIL = "email";
-	private static final String ORG_PASSWORD = "password";
-	private static final String ORG_ORGPIC = "orgPic";
+
+	private static final String VOLEVENT_ID = "eventID";
+	private static final String VOLEVENT_VOLUNTEERID = "volunteerID";
+	private static final String VOLEVENT_ORGANIZATIONID = "organizationID";
+	private static final String VOLEVENTG_DATE  = "date";
+	private static final String VOLEVENT_STARTTIME = "startTime";
+	private static final String VOLEVENT_ENDTIME = "endTime";
+	private static final String VOLEVENTG_DETAILS = "details";
+	private static final String VOLEVENTG_TITLE = "title";
+
 	private static final String IS_DELETE = "delete";
-	// ex. when fail
 	public static final int DB_RETRY_TIMES = 5;
 
 	public void init(ServletConfig config) throws ServletException {
@@ -74,24 +70,23 @@ public class WebOrgManageServlet extends HttpServlet {
 		int retry = DB_RETRY_TIMES;
 		Connection conn = null;
 
-		/**
-		 * organization fields
-		 */
-		
-		String organizationId=null;
-		String organizationName = null;
-		String address = null;
-		String email = null;
-		String password = null;
-		boolean isReqFromApp = false;
-		String dataFromApp = null;
+
+		String eventID = null;
+		String volunteerID = null;
+		String organizationID = null;
+		String date = null;
+		String startTime = null;
+		String endTime = null;
+		String details = null;
+		String title = null;
+			
 		boolean isDelete = false;
-		String fileName = null;
-		byte[] orgPic = null;
+		//String fileName = null;
+		
 		String respPage = RESOURCE_FAIL_TAG;
 		try {
 
-			System.out.println("=======Org Servlet =======");
+			System.out.println("=======VOlEvent Servlet =======");
 			// Parse the incoming HTTP request
 			// Commons takes over incoming request at this point
 			// Get an iterator for all the data that was sent
@@ -118,38 +113,36 @@ public class WebOrgManageServlet extends HttpServlet {
 					String fieldvalue = item.getString();
 
 					System.out.println(fieldname + "=" + fieldvalue);
+				
 					
-					if (fieldname.equals("data")) { // a request from app to with object
-						isReqFromApp = true;	
-						dataFromApp = fieldvalue;						
-					}
-					else if (fieldname.equals("req")) {
-						isDelete = fieldvalue.equals("15"); //request code for delete from app
-					}
-					//request from web
-					else if (fieldname.equals(ORG_ID)) {
-						organizationId = fieldvalue;
-					} else if (fieldname.equals(ORG_NAME)) {
-						organizationName = fieldvalue;
-					} else if (fieldname.equals(ORG_ADDRESS)) {
-						address = fieldvalue;
-					} else if (fieldname.equals(ORG_EMAIL)) {
-						email = fieldvalue;
-					} else if (fieldname.equals(ORG_PASSWORD)) {
-						password = fieldvalue;
-					
+					if (fieldname.equals(VOLEVENT_ID)) {
+						eventID = fieldvalue;
+					} else if (fieldname.equals(VOLEVENT_VOLUNTEERID)) {
+						volunteerID = fieldvalue;
+					} else if (fieldname.equals(VOLEVENT_ORGANIZATIONID)) {
+						organizationID = fieldvalue;
+					} else if (fieldname.equals(VOLEVENTG_DATE)) {
+						date = fieldvalue;
+					} else if (fieldname.equals(VOLEVENT_STARTTIME)) {
+						startTime = fieldvalue;
+					} else if (fieldname.equals(VOLEVENT_ENDTIME)) {
+						endTime = fieldvalue;					
+					} else if (fieldname.equals(VOLEVENTG_DETAILS)) {
+						details = fieldvalue;
+					} else if (fieldname.equals(VOLEVENTG_TITLE)) {
+						title = fieldvalue;
 					}else if (fieldname.equals(IS_DELETE)) {
 
 						isDelete = Boolean.valueOf(fieldvalue);
-					
+
 					}
 
-				} else {
+				} //else {
 
-					fileName = item.getName();
-					orgPic = item.get();
+					//fileName = item.getName();
+					
 
-				}
+				//}
 			}
 
 			while (retry > 0) {
@@ -157,51 +150,45 @@ public class WebOrgManageServlet extends HttpServlet {
 				try {
 
 					conn = ConnPool.getInstance().getConnection();
-					OrganizationResProvider orgProvider = new OrganizationResProvider();
-					Organization org= new Organization();
+
+					VolEventResProvider volEventProvider = new VolEventResProvider();
 					
-					if(!isReqFromApp){
-						 org = new Organization( organizationName,  address, email,  password, orgPic);
-							if (isDelete) {
+			
+					
+					java.util.Date eventDate = FilesUtils.getDateFromString(date);
+					java.util.Date startEvent = FilesUtils.getDateTimeFromString(startTime);
+					java.util.Date endEvent = FilesUtils.getDateTimeFromString(endTime);
+					int vol=  Integer.parseInt(volunteerID);
+					int org=  Integer.parseInt(organizationID);
 
-								if(orgProvider.deleteOrganization(org, conn)){
-									respPage = RESOURCE_SUCCESS_TAG;
-								}
-							
-
-							} else {
 						
-								
-								if (orgProvider.insertOrganization(org, conn)) {
-									respPage = RESOURCE_SUCCESS_TAG;
-								}
+					VolEvent volevent = new VolEvent( vol, org,
+							eventDate, details,   startEvent,  endEvent,  title);
+					
+					/*ItemsResProvider itemResProvider = new ItemsResProvider();
+					Item item = new Item(volID, email, fName, image, lName);*/
 
-							}
+					if (isDelete) {
+
+						if(volEventProvider.deleteVolEvent(volevent, conn)){
+							respPage = RESOURCE_SUCCESS_TAG;
+						}
+						/*if (itemResProvider.deleteItem(item, conn)) {
+							respPage = RESOURCE_SUCCESS_TAG;
+						}*/
+
+					} else {
+					/*	if (itemResProvider.insertItem(item, conn)) {
+							respPage = RESOURCE_SUCCESS_TAG;
+						}*/
+						
+						if (volEventProvider.insertVolEvent(volevent, conn)) {
+							respPage = RESOURCE_SUCCESS_TAG;
+						}
+
 					}
-					else{
-						JSONTokener jsonTokener = new JSONTokener(dataFromApp);
 
-			            JSONObject json = (JSONObject) jsonTokener.nextValue();
-			            
-						
-						if (org.fromJson(json)) {
-							if (isDelete) {
-
-								if(orgProvider.deleteOrganization(org, conn)){
-									respPage = RESOURCE_SUCCESS_TAG;
-								}
-							
-
-							} else {
-								if (orgProvider.insertOrganization(org, conn)) {
-									respPage = RESOURCE_SUCCESS_TAG;
-								}
-
-							}
-						
-						}					
-					}
-				
+					
 					retry = 0;
 
 				} catch (SQLException e) {
@@ -229,5 +216,6 @@ public class WebOrgManageServlet extends HttpServlet {
 			e.printStackTrace();
 		}
 	}
+
 
 }

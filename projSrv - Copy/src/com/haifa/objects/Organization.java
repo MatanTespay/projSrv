@@ -1,7 +1,6 @@
 package com.haifa.objects;
 
 import java.sql.Blob;
-import java.util.Base64;
 import java.util.List;
 
 import com.haifa.utils.FilesUtils;
@@ -101,35 +100,6 @@ public class Organization {
 		iObj.put("ProfilePic",  (isImageExists() ?  FilesUtils.blobToBase64String(getProfilePic()) : "" ) );
 		return iObj;
 	}
-	
-	/**
-	 * convert input jason to object
-	 * @param fObj
-	 * @return
-	 */
-    public boolean fromJson(JSONObject fObj) {
-        boolean res = false;
-        try {
-            setId(fObj.getInt("organizationID"));
-            setName(fObj.getString("organizationName"));
-            setAddress(fObj.getString("Address"));
-            setEmail(fObj.getString("Email"));
-            setPassword(fObj.getString("Password"));
-           
-            // get image encoded string
-            String data = fObj.getString("ProfilePic");
-            if(data != null && !data.equals("")){
-            	 byte[] decodedString = Base64.getDecoder().decode(fObj.getString("ProfilePic"));           
-                 setProfilePic(decodedString);
-            }
-           
-
-            res = true;
-        } catch (Throwable t) {
-            t.printStackTrace();
-        }
-        return res;
-    }
 /**
  * Checks if there is image saved in db.
  * @return true if exist false otherwise

@@ -1,6 +1,5 @@
 package com.haifa.objects;
 
-import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 
@@ -110,7 +109,7 @@ public class VolEvent {
      * Create a json object from Org. object
      * @return
      */
- 
+  
     	public JSONObject toJson() {
     		//(int id , String name, String address, 
     		//String email, String password, byte[] profilePic)
@@ -126,30 +125,7 @@ public class VolEvent {
     		iObj.put("title", getTitle());
     		return iObj;
     	}
-
-    	/**
-    	 * convert input jason to object
-    	 * @param fObj
-    	 * @return
-    	 */
-        public boolean fromJson(JSONObject iObj) {
-            boolean res = false;
-            try {
-                setVolEventID(iObj.getInt("eventID"));
-                setVolID(iObj.getInt("volunteerID"));
-                setOrgID(iObj.getInt("organizationID"));
-                setDate(FilesUtils.getDateFromString(iObj.getString("date")));
-                setStartTime(FilesUtils.getDateTimeFromString(iObj.getString("startTime")));
-                setEndTime(FilesUtils.getDateTimeFromString(iObj.getString("endTime")));
-                setDetails(iObj.getString("details"));
-                setTitle(iObj.getString("title"));
-                
-                res = true;
-            } catch (Throwable t) {
-                t.printStackTrace();
-            }
-            return res;
-        }
+   
     /**
      * 
      * @param list

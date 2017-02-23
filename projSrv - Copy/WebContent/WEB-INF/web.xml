@@ -28,7 +28,7 @@
 		<url-pattern>/projres</url-pattern>
 	</servlet-mapping>
 
-<!-- 	<servlet>
+	<servlet>
 		<description></description>
 		<display-name>WebFoldersManageServlet</display-name>
 		<servlet-name>WebFoldersManageServlet</servlet-name>
@@ -50,7 +50,7 @@
 	<servlet-mapping>
 		<servlet-name>WebItemsManageServlet</servlet-name>
 		<url-pattern>/web_item_manage</url-pattern>
-	</servlet-mapping> -->
+	</servlet-mapping>
 
 	<servlet>
 		<description></description>
@@ -74,7 +74,7 @@
 		<url-pattern>/web_org_manage</url-pattern>
 	</servlet-mapping>
 	
-	<servlet>
+		<servlet>
 		<description></description>
 		<display-name>WebVolEventManageServlet</display-name>
 		<servlet-name>WebVolEventManageServlet</servlet-name>
