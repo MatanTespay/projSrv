@@ -378,7 +378,6 @@ public class ProjectResourceServlet extends HttpServlet {
 					}
 					case GET_SCREENTIME_REQ: {
 						String userID = req.getParameter("userId");
-					//	String screenID = req.getParameter("screenId");
 						
 						conn = ConnPool.getInstance().getConnection();
 						ScreenTimeResProvider screenProvider = new ScreenTimeResProvider();

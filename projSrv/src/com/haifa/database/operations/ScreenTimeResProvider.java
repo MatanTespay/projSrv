@@ -23,9 +23,9 @@ public class ScreenTimeResProvider {
    // private static final String selectScreen_name = "SELECT screenName FROM screen WHERE  screenID = ? ";
 
 	private static final String selectByUser_sql = 
-	"SELECT st.UserID, st.screenID,  s.screenName, st.date, sum(duration) as TimeInDay"
+	"SELECT email, st.UserID, st.screenID,  s.screenName, st.date, sum(duration) as TimeInDay"
 	+ " from screen_time st inner join screen s "
-	+ " on st.screenID = s.screenID"
+	+ " on st.screenID = s.screenID inner join volunteer v on st.UserID = v.volunteerID "
 	+ " where st.userID = ?"
 	+ " group by st.UserID, st.screenID,  s.screenName, st.date"
 	+ " order by date";
@@ -66,10 +66,11 @@ public class ScreenTimeResProvider {
 				int screenID = rs.getInt("screenID");
 				Date date = rs.getDate("date");
 				String name = rs.getString("screenName");
+				String email = rs.getString("email");
 				int sumDuration = rs.getInt("TimeInDay");
-				long lonDuration = rs.getLong("TimeInDay");
+				//long lonDuration = rs.getLong("TimeInDay");
 
-				ScreenTime obj = new ScreenTime(userID, screenID, date,  sumDuration, name);
+				ScreenTime obj = new ScreenTime(0, userID, screenID, date,  sumDuration, name, email);
 						results.add(obj);
 
 			

@@ -10,14 +10,14 @@ function getScreenTime(){
 	
 	var userID, screenId;
 	userId = $("#userID").val();
-	screenId = $("#screenID").val();
+
 	
-	if(userId !== "" && screenId !== ""){
+	if(userId !== ""){
 		 $.ajax({
 			 	type: 'POST',
 			 	data: { 
 			        'userId': userId, 
-			        'screenId':screenId ,
+			      
 			        'req':11 ,
 			        
 			    }, 
@@ -214,9 +214,7 @@ function addTable(arr, title, col_names) {
 <label> 
 		VolunteerID: <input type="text"  id="userID" /> <br /> <br />
 		</label> 
-        <label> 
-		    ScreenID: <input type="text" id="screenID" /> <br /> <br />
-		</label> 
+
 <button type="button"
 onclick="getScreenTime()">Get Screen Time
 </button>
