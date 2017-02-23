@@ -7,7 +7,7 @@
 <script type="text/javascript">
 
 function getScreenTime(){
-	debugger;
+	
 	var userID, screenId;
 	userId = $("#userID").val();
 	screenId = $("#screenID").val();
@@ -32,8 +32,13 @@ function getScreenTime(){
 }
 
 function handleData(returnedData) {
+	
+	var name ;
 	if(returnedData != null){
-		alert(returnedData)
+		if(typeof returnedData !== "undefined" && returnedData["screenTime"] !== null){
+			addTable(returnedData["screenTime"], "screenTime" , ["email","date",  "duration","ScreenName"  ])
+		}
+		
 	}
 	else{
 		alert("error");
@@ -41,10 +46,60 @@ function handleData(returnedData) {
 	 
 }
 
+function addTable(arr, title, col_names) {
+    
+	//get main div
+    var myTableDiv = document.getElementById("myDynamicTable");
+      
+	//create new table
+    var table = document.createElement('TABLE');
+    table.border='1';
+    
+    //set header to table
+    var header = $("<div>").html(title);
+    $("myDynamicTable").append(header);        
+    
+    //set tble contetnt
+    var tableBody = document.createElement('TBODY');
+    table.appendChild(tableBody);
+      
+  //get all data for content
+    var data = arr[0];
+  
+	    
+    for (var row_num=0; row_num < data.length; row_num++){
+    	
+    	var row = data[0];
+    	        
+       var tr = document.createElement('TR');
+       tr.setAttribute('name',arr[0])
+       tableBody.appendChild(tr);
+       
+       for (var c_num=0; c_num < row.length; c_num++){
+    	   var th = document.createElement('th');
+    	   th.width='75';
+    	   th.appendChild(document.createTextNode(arr[0][c_num]));
+    	   th.appendChild(td);
+       }
+       
+       
+       for (var c_num=0; c_num < row.length; c_num++){
+           var td = document.createElement('TD');
+           td.width='75';
+           td.appendChild(document.createTextNode(arr[0][c_num]));
+           tr.appendChild(td);
+       }
+    }
+    
+    //add tablr to main div
+    myTableDiv.appendChild(table);
+    
+}
 </script>
 </head>
 <body>
-
+<div id="myDynamicTable">
+</div>
 <!--START VOLUNTEER -->
 <h3>GET ALL Volunteers</h3>
 <form method="post" action="http://localhost:8080/projSrv/projres?" name="submit">
