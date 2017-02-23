@@ -13,6 +13,14 @@ public class ScreenTime {
 	private int Id;
 	private int userId;	
 	private int screenId;	
+	private String email;
+	
+	public String getEmail() {
+		return email;
+	}
+	public void setEmail(String email) {
+		this.email = email;
+	}
 	public String getName() {
 		return name;
 	}
@@ -27,14 +35,14 @@ public class ScreenTime {
 		super();
 	}
 	public ScreenTime(int userId, int screenId, Date date, int duration ,String name) {
-		this(0,  userId,  screenId,  date, duration , name);
+		this(0,  userId,  screenId,  date, duration , name,"");
 	}
 	//ScreenTime(userID, screenID,  Name,  sumDuration)
 	public ScreenTime(int userId, int screenId, Date date, int duration) {
-		this(0,  userId,  screenId,  date, duration , "");
+		this(0,  userId,  screenId,  date, duration , "","");
 	}
 	public ScreenTime(int id, int userId, int screenId, Date date,
-			int duration, String name) {
+			int duration, String name, String email) {
 		super();
 		Id = id;
 		this.userId = userId;
@@ -42,6 +50,7 @@ public class ScreenTime {
 		this.date = date;
 		this.name = name;
 		this.duration = duration;
+		this.email =email;
 	}
 	public int getId() {
 		return Id;
@@ -117,6 +126,7 @@ public class ScreenTime {
 
 				JSONObject iObj = new JSONObject();
 				iObj.put("ID", getId());
+				iObj.put("email", getEmail());
 				iObj.put("UserId", getUserId());
 				iObj.put("ScreenId", getScreenId());
 				iObj.put("Date", (getDate() != null ) ? FilesUtils.getShortDateString(getDate()) : "");
