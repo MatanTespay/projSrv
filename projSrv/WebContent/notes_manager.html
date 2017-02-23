@@ -60,10 +60,14 @@ function handleData(returnedData) {
 
 			addTable(returnedData["volunteers"], "volunteers" , ["volID","fname",  "lname","birthDate","address","email","password","ProfilePic" ])
 		}
-		else if(typeof returnedData !== "undefined" && returnedData["organizations"] !== null){
-			addTable(returnedData["volunteers"], "volunteers" , ["volID","fname",  "lname","birthDate","address","email","password","ProfilePic" ])
+		else if(typeof returnedData !== "undefined" && typeof returnedData["organizations"] !== "undefined"){
+			
+			addTable(returnedData["organizations"], "organizations" , ["organizationID","organizationName",  "Address","Email","Password","ProfilePic" ])
 		}
-		
+		else if(typeof returnedData !== "undefined" && typeof returnedData["VolEvents"] !== "undefined"){
+			
+			addTable(returnedData["VolEvents"], "VolEvents" , ["eventID","volunteerID",  "organizationID","date","startTime","endTime" ,"details", "title"])
+		}
 	}
 	else{
 		alert("error");
@@ -310,6 +314,21 @@ onclick="getScreenTime()">Get Screen Time
 
 <button type="button"
 onclick="getData(8)">GO
+</button>
+
+
+<!-- ORGS -->
+<h2>GET ALL Organizations</h2>
+
+<button type="button"
+onclick="getData(9)">GO
+</button>
+
+<!-- VOLEVENT -->
+<h2>GET ALL VolEvents</h2>
+
+<button type="button"
+onclick="getData(10)">GO
 </button>
 <div id="myDynamicTable">
 </div>
