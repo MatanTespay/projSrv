@@ -27,16 +27,41 @@ function getScreenTime(){
 			    }
 		});
 	}
+}
 
-	
+function getData(req){
+		
+	if(req !== ""){
+		 $.ajax({
+			 	type: 'POST',
+			 	data: { 
+			        		      
+			        'req':req ,
+			        
+			    }, 
+			    url:"projres",  
+			    success:function(data) {
+			      handleData(data); 
+			    }
+		});
+	}
 }
 
 function handleData(returnedData) {
 	
 	var name ;
 	if(returnedData != null){
-		if(typeof returnedData !== "undefined" && returnedData["screenTime"] !== null){
+		
+		if(typeof returnedData !== "undefined" && typeof returnedData["screenTime"] !== "undefined"){
+			
 			addTable(returnedData["screenTime"], "screenTime" , ["email","date",  "duration","ScreenName"  ])
+			
+		}else if(typeof returnedData !== "undefined" && typeof returnedData["volunteers"] !== "undefined"){
+
+			addTable(returnedData["volunteers"], "volunteers" , ["volID","fname",  "lname","birthDate","address","email","password","ProfilePic" ])
+		}
+		else if(typeof returnedData !== "undefined" && returnedData["organizations"] !== null){
+			addTable(returnedData["volunteers"], "volunteers" , ["volID","fname",  "lname","birthDate","address","email","password","ProfilePic" ])
 		}
 		
 	}
@@ -46,53 +71,116 @@ function handleData(returnedData) {
 	 
 }
 
+function dhm(t){
+    var cd = 24 * 60 * 60 * 1000,
+        ch = 60 * 60 * 1000,
+        d = Math.floor(t / cd),
+        h = Math.floor( (t - d * cd) / ch),
+        m = Math.round( (t - d * cd - h * ch) / 60000),
+        pad = function(n){ return n < 10 ? '0' + n : n; };
+  if( m === 60 ){
+    h++;
+    m = 0;
+  }
+  if( h === 24 ){
+    d++;
+    h = 0;
+  }
+  return [d + " days", pad(h) + " hours", pad(m) + " seconds"].join(':');
+}
+	
 function addTable(arr, title, col_names) {
     
 	//get main div
-    var myTableDiv = document.getElementById("myDynamicTable");
+    var myTableDiv;
+	//clear content
+	myTableDiv = $("#myDynamicTable").html("");
       
 	//create new table
-    var table = document.createElement('TABLE');
-    table.border='1';
+    //var table = document.createElement('TABLE');
+    var table = $("<table>");
+	table.attr('border', '1');
     
     //set header to table
     var header = $("<div>").html(title);
     $("myDynamicTable").append(header);        
     
     //set tble contetnt
-    var tableBody = document.createElement('TBODY');
-    table.appendChild(tableBody);
+    //var tableBody = document.createElement('TBODY');
+    //table.appendChild(tableBody);
       
-  //get all data for content
-    var data = arr[0];
-  
+   //get all data for content
+    var data = arr;
+   
+     //set table headers     
+      //var tr = document.createElement('TR');
+      var tr = $("<tr>");
+     //tr.setAttribute('name',data[0])
+      //tableBody.appendChild(tr);
+      	table.append(tr);
+      	
+       for (var c_num=0; c_num < col_names.length; c_num++){
+   	   //var th = document.createElement('th');
+   	   var th = $("<th>");
+   	  // th.width='75';
+   	  th.html(col_names[c_num]);
+   	  // th.appendChild(document.createTextNode(col_names[c_num]));
+   	  tr.append(th); 
+   	  //tr.appendChild(th);
+      }
+	       
+	
 	    
+   //set table data
     for (var row_num=0; row_num < data.length; row_num++){
     	
-    	var row = data[0];
-    	        
-       var tr = document.createElement('TR');
-       tr.setAttribute('name',arr[0])
-       tableBody.appendChild(tr);
+    	//get row
+    	var row = data[row_num];
+    	
+    	//var tr = document.createElement('TR');
+    	var tr = $("<tr>");
+    	table.append(tr);
+        //tableBody.appendChild(tr);
+        
+        var idx = -1;
+    	for ( var val in row) {
+    		//var td = document.createElement('TD');
+    		var td = $("<td>");
+    		
+    		var id = row_num + '_' + val;
+    		td.attr('border', id);
+    		//td.setAttribute('name',id)
+            //td.width='100';
+            
+            //change logic acording to content of cell
+            if(val == "Duration"){
+            	td.html(dhm(row[val]));
+            }
+            else if(val == "ProfilePic"){
+            	
+            	 var img = $("<img>", {
+            		  "src": "data:image/png;base64," + row[val],
+            		  // added `width` , `height` properties to `img` attributes
+            		  "width": "100px", "height": "100px"}) 
+            	if(typeof row[val] !== "undefined" && row[val] !== "")
+            		td.append(img);            	 
+            	else{
+            		td.html("none");	
+            	}
+            }
+            else{
+            	td.html(row[val]);
+            }
+            
+            tr.append(td);
+            idx++;
+		}
+    	
        
-       for (var c_num=0; c_num < row.length; c_num++){
-    	   var th = document.createElement('th');
-    	   th.width='75';
-    	   th.appendChild(document.createTextNode(arr[0][c_num]));
-    	   th.appendChild(td);
-       }
-       
-       
-       for (var c_num=0; c_num < row.length; c_num++){
-           var td = document.createElement('TD');
-           td.width='75';
-           td.appendChild(document.createTextNode(arr[0][c_num]));
-           tr.appendChild(td);
-       }
     }
     
     //add tablr to main div
-    myTableDiv.appendChild(table);
+    myTableDiv.append(table);
     
 }
 </script>
@@ -210,7 +298,7 @@ function addTable(arr, title, col_names) {
   		
 </form>
 
-<h1>GET SCREEN TIME</h1>
+<h2>GET SCREEN TIME</h2>
 <label> 
 		VolunteerID: <input type="text"  id="userID" /> <br /> <br />
 		</label> 
@@ -218,19 +306,13 @@ function addTable(arr, title, col_names) {
 <button type="button"
 onclick="getScreenTime()">Get Screen Time
 </button>
-<!--END VOLEVENT -->
-<!--image-->
-<!--
-<h3>GET IMAGE OF ITEM</h3>
-<form method="post" action="http://localhost:8080/projSrv/projres?" name="submit">
-		<input type="hidden" name="req" value="5"> 
-  		<label>
-			id: <input type="text" name="it_id"  /> <br /> <br /> 
-		</label>
-  		<input type="submit" name="submit" value="ok">
-  		
-</form>
--->
+
+<!-- VOLS -->
+<h2>GET ALL Volunteers</h2>
+
+<button type="button"
+onclick="getData(8)">GO
+</button>
 
 </body>
 </html>
