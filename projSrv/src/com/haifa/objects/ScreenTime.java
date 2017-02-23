@@ -125,10 +125,10 @@ public class ScreenTime {
 				//String email, String password, byte[] profilePic)
 
 				JSONObject iObj = new JSONObject();
-				iObj.put("ID", getId());
+				//iObj.put("ID", getId());
 				iObj.put("email", getEmail());
-				iObj.put("UserId", getUserId());
-				iObj.put("ScreenId", getScreenId());
+				//iObj.put("UserId", getUserId());
+				//iObj.put("ScreenId", getScreenId());
 				iObj.put("Date", (getDate() != null ) ? FilesUtils.getShortDateString(getDate()) : "");
 				iObj.put("Duration", getDuration() );
 				iObj.put("Name", getName() );
