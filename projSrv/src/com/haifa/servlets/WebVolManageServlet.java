@@ -2,7 +2,6 @@ package com.haifa.servlets;
 
 import java.io.IOException;
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
@@ -21,9 +20,7 @@ import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 
 import com.haifa.database.operations.ConnPool;
-import com.haifa.database.operations.ItemsResProvider;
 import com.haifa.database.operations.VolunteerResProvider;
-import com.haifa.objects.Item;
 import com.haifa.objects.Volunteer;
 import com.haifa.utils.FilesUtils;
 
@@ -183,11 +180,6 @@ public class WebVolManageServlet extends HttpServlet {
 						}
 
 					}
-
-					/*if (image != null && image.length > 0) {
-
-						FilesUtils.writeLocalCopy(fileName, image, false);
-					}*/
 
 					retry = 0;
 

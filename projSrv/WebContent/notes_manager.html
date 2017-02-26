@@ -6,6 +6,9 @@
 <script src="jquery-3.1.1.min.js"></script>
 <script type="text/javascript">
 
+/**
+ * get the screen time for app
+ */
 function getScreenTime(){
 	
 	var userID, screenId;
@@ -29,6 +32,9 @@ function getScreenTime(){
 	}
 }
 
+/**
+ * get the for bject by request id
+ */
 function getData(req){
 		
 	if(req !== ""){
@@ -47,23 +53,29 @@ function getData(req){
 	}
 }
 
+// create table of the incoming object data
 function handleData(returnedData) {
 	
 	var name ;
 	if(returnedData != null){
 		
+		//set table for screenTime
 		if(typeof returnedData !== "undefined" && typeof returnedData["screenTime"] !== "undefined"){
 			
 			addTable(returnedData["screenTime"], "screenTime" , ["email","date",  "duration","ScreenName"  ])
 			
-		}else if(typeof returnedData !== "undefined" && typeof returnedData["volunteers"] !== "undefined"){
+		}
+		//set table for volunteers
+		else if(typeof returnedData !== "undefined" && typeof returnedData["volunteers"] !== "undefined"){
 
 			addTable(returnedData["volunteers"], "volunteers" , ["volID","fname",  "lname","birthDate","address","email","password","ProfilePic" ])
 		}
+		//set table for organizations
 		else if(typeof returnedData !== "undefined" && typeof returnedData["organizations"] !== "undefined"){
 			
 			addTable(returnedData["organizations"], "organizations" , ["organizationID","organizationName",  "Address","Email","Password","ProfilePic" ])
 		}
+		//set table for events
 		else if(typeof returnedData !== "undefined" && typeof returnedData["VolEvents"] !== "undefined"){
 			
 			addTable(returnedData["VolEvents"], "VolEvents" , ["eventID","volunteerID",  "organizationID","date","startTime","endTime" ,"details", "title"])
@@ -90,7 +102,8 @@ function dhm(t){
     d++;
     h = 0;
   }
-  return [d + " days", pad(h) + " hours", pad(m) + " seconds"].join(':');
+  return [ pad(h) + " hours", pad(m) + " seconds"].join(':');
+  //return [d + " days", pad(h) + " hours", pad(m) + " seconds"].join(':');
 }
 	
 function addTable(arr, title, col_names) {
@@ -191,13 +204,13 @@ function addTable(arr, title, col_names) {
 </head>
 <body>
 <!--START VOLUNTEER -->
-<h3>GET ALL Volunteers</h3>
+<!-- <h3>GET ALL Volunteers</h3>
 <form method="post" action="http://localhost:8080/projSrv/projres?" name="submit">
 		<input type="hidden" name="req" value="8"> 
   		<input type="submit" name="submit" value="ok">
   		
 </form>
-<br>
+<br> -->
 <h3> VOLUNTEER INSERT/UPDATE/REMOVE OPERATIONS </h3> 
 <form method="post" action="http://localhost:8080/projSrv/web_vol_manage?" name="submit" enctype="multipart/form-data">
  
@@ -230,13 +243,13 @@ function addTable(arr, title, col_names) {
 
 
 <!--START ORGANIZATION -->
-<h3>GET ALL ORGANIZATION</h3>
+<!-- <h3>GET ALL ORGANIZATION</h3>
 <form method="post" action="http://localhost:8080/projSrv/projres?" name="submit">
 		<input type="hidden" name="req" value="9"> 
   		<input type="submit" name="submit" value="ok">
   		
 </form>
-<br>
+<br> -->
 <h3> ORGANIZATION INSERT/UPDATE/REMOVE OPERATIONS </h3> 
 <form method="post" action="http://localhost:8080/projSrv/web_org_manage?" name="submit" enctype="multipart/form-data">
  
@@ -261,13 +274,13 @@ function addTable(arr, title, col_names) {
 </form>
 <!--END ORGANIZATION -->
 <!--START VOLEVENT -->
-<h3>GET ALL VOLEVENT</h3>
+<!-- <h3>GET ALL VOLEVENT</h3>
 <form method="post" action="http://localhost:8080/projSrv/projres?" name="submit">
 		<input type="hidden" name="req" value="10"> 
   		<input type="submit" name="submit" value="ok">
   		
 </form>
-<br>
+<br> -->
 
 
 <h3> VOLEVENT INSERT/UPDATE/REMOVE OPERATIONS </h3> 

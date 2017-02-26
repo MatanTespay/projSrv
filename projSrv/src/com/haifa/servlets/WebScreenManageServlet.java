@@ -2,7 +2,6 @@ package com.haifa.servlets;
 
 import java.io.IOException;
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
 
@@ -13,6 +12,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import net.sf.json.JSONObject;
+import net.sf.json.util.JSONTokener;
+
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
 import org.apache.commons.fileupload.FileUploadException;
@@ -20,30 +22,29 @@ import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 
 import com.haifa.database.operations.ConnPool;
-import com.haifa.database.operations.ItemsResProvider;
-import com.haifa.objects.Item;
+import com.haifa.database.operations.ScreenTimeResProvider;
+import com.haifa.objects.ScreenTime;
 import com.haifa.utils.FilesUtils;
 
 /**
  * Servlet implementation class WebItemsManageServlet
  */
 
-public class WebItemsManageServlet extends HttpServlet {
+public class WebScreenManageServlet extends HttpServlet {
 
-	
 	private static final long serialVersionUID = 1L;
-	
-	
+
 	private static final String RESOURCE_FAIL_TAG = "{\"result_code\":0}";
 	private static final String RESOURCE_SUCCESS_TAG = "{\"result_code\":1}";
-	
-	private static final String ITEM_ID = "it_id";
-	private static final String ITEM_TITLE = "it_title";
-	private static final String ITEM_DESCRIPTION = "it_desc";
-	private static final String ITEM_FOLDER_ID = "it_fid";
+
+
 	private static final String IS_DELETE = "delete";
-	public static final int DB_RETRY_TIMES=5;
-	
+	public static final int DB_RETRY_TIMES = 5;
+
+	private static final String USER_ID = "userID";
+	private static final String SCREEN_ID = "screenID";
+	private static final String DATE = "date";
+	private static final String DURATION = "duration";
 	
 	public void init(ServletConfig config) throws ServletException {
 
@@ -58,33 +59,32 @@ public class WebItemsManageServlet extends HttpServlet {
 
 	}
 
-	
 	protected void service(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
-		
+
 		// Commons file upload classes are specifically instantiated
 		FileItemFactory factory = new DiskFileItemFactory();
 
 		ServletFileUpload upload = new ServletFileUpload(factory);
 		ServletOutputStream out = null;
-		
+
 		int retry = DB_RETRY_TIMES;
 		Connection conn = null;
+
+
+		String userID = null;
+		String screenID = null;
+		String date = null;
+		String duration = null;
 		
+		String dataFromApp = null;
 		
-		
-		String itemId = null;
-		String itemTitle = null;
-		String itemDesc = null;
-		String itemFolderId = null;
 		boolean isDelete = false;
-		String fileName = null;
 		
-		byte [] image= null;
 		String respPage = RESOURCE_FAIL_TAG;
 		try {
-			
-			System.out.println("=======Item Servlet =======");
+
+			System.out.println("=======VOl Servlet =======");
 			// Parse the incoming HTTP request
 			// Commons takes over incoming request at this point
 			// Get an iterator for all the data that was sent
@@ -105,71 +105,57 @@ public class WebItemsManageServlet extends HttpServlet {
 				// If the current item is an HTML form field
 				if (item.isFormField()) {
 					// If the current item is file data
-					
+
 					// If the current item is file data
 					String fieldname = item.getFieldName();
 					String fieldvalue = item.getString();
 
 					System.out.println(fieldname + "=" + fieldvalue);
-
-				
-					if (fieldname.equals(ITEM_ID)) {
-						itemId =fieldvalue;
-					} else if (fieldname.equals(ITEM_TITLE)) {
-						itemTitle = fieldvalue;
-					} else if (fieldname.equals(ITEM_DESCRIPTION)) {
-						itemDesc = fieldvalue;
-					} else if (fieldname.equals(ITEM_FOLDER_ID)) {
-						itemFolderId = fieldvalue;
+					if(fieldname.equals("data")){
+						dataFromApp = fieldvalue ;
 					}
-					else if(fieldname.equals(IS_DELETE)){
-						isDelete = Boolean.valueOf(fieldvalue);						
-					}
-					
-					
-				} else {
+					if (fieldname.equals(USER_ID)) {
+						userID = fieldvalue;
+					} else if (fieldname.equals(SCREEN_ID)) {
+						screenID = fieldvalue;
+					} else if (fieldname.equals(DATE)) {
+						date = fieldvalue;
+					} else if (fieldname.equals(DURATION)) {
+						duration = fieldvalue;
+					} 
 
-					fileName = item.getName();
-					image = item.get();
-
-				}
+				} 
 			}
-			
+
 			while (retry > 0) {
 
 				try {
 
-				
 					conn = ConnPool.getInstance().getConnection();
+
+					ScreenTimeResProvider screen_Provider = new ScreenTimeResProvider();
 					
-					ItemsResProvider itemResProvider = new ItemsResProvider();
-					Item item = new Item(itemId, itemTitle, itemDesc, image, itemFolderId);
+					/*java.util.Date the_date = FilesUtils.getDateFromString(date);
+					int user_id = Integer.parseInt(userID);
+					int screen_id = Integer.parseInt(screenID);
+					long the_duration = Long.parseLong(duration);*/
+					JSONTokener jsonTokener = new JSONTokener(dataFromApp);
+
+		            JSONObject json = (JSONObject) jsonTokener.nextValue();
+		            
+					ScreenTime screen = new ScreenTime();
+										
 					
-					if(isDelete){
-						
-						
-						if(itemResProvider.deleteItem(item, conn)){
+					if(screen.fromJson(json)){
+						if (screen_Provider.insertScreenTime(screen, conn)) {
 							respPage = RESOURCE_SUCCESS_TAG;
 						}
-						
-					}
-					else{
-						if(itemResProvider.insertItem(item, conn)){
-							respPage = RESOURCE_SUCCESS_TAG;
-						}
-						
 					}
 					
-					if(image!=null && image.length>0){
-			
-						FilesUtils.writeLocalCopy(fileName, image, false);
-					}
 					
+
 					retry = 0;
 
-				} catch (SQLException e) {
-					e.printStackTrace();
-					retry--;
 				} catch (Throwable t) {
 					t.printStackTrace();
 					retry = 0;
@@ -180,11 +166,10 @@ public class WebItemsManageServlet extends HttpServlet {
 				}
 
 			}
-			
+
 			out.println(respPage);
 			out.close();
-			
-	
+
 		} catch (FileUploadException fue) {
 			fue.printStackTrace();
 		} catch (IOException ioe) {

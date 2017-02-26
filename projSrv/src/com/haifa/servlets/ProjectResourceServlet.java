@@ -1,36 +1,25 @@
 package com.haifa.servlets;
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.Date;
 import java.util.List;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
-import javax.servlet.ServletInputStream;
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import net.sf.json.JSONObject;
 import net.sf.json.util.JSONTokener;
-import jdk.nashorn.api.scripting.JSObject;
 
 import com.haifa.database.operations.ConnPool;
-import com.haifa.database.operations.FoldersResProvider;
-import com.haifa.database.operations.ItemsResProvider;
 import com.haifa.database.operations.OrganizationResProvider;
 import com.haifa.database.operations.ScreenTimeResProvider;
 import com.haifa.database.operations.VolEventResProvider;
 import com.haifa.database.operations.VolunteerResProvider;
-import com.haifa.objects.Folder;
-import com.haifa.objects.Item;
 import com.haifa.objects.Organization;
 import com.haifa.objects.ScreenTime;
 import com.haifa.objects.VolEvent;
@@ -45,20 +34,7 @@ public class ProjectResourceServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	// ========
-	private static final int GET_ALL_FOLDERS_JSON_REQ = 0;
-	private static final int INSERT_FOLDER_REQ = 1;
-	private static final int DELETE_FOLDER_REQ = 2;
-	private static final int INSERT_ITEM_REQ = 3;
-	private static final int DELETE_ITEM_REQ = 4;
-	private static final int GET_ITEM_IMAGE_REQ = 5;
-	private static final int GET_ITEMS_OF_FOLDER_JSON_REQ = 6;
-	private static final int GET_FILE_FROM_FILESYSTEM_REQ = 7;
-	private static final int UPDATE_ORG_REQ = 12;
-	
 
-	// requserts numbers
-	
-	
 	// VOLUNEER
 	private static final int GET_VOLUNTEERS_REQ = 8;
 	// columns
@@ -71,7 +47,7 @@ public class ProjectResourceServlet extends HttpServlet {
 	private static final String VOL_BIRTHDATE = "birthDate";
 	private static final String VOL_PROFILEPIC = "profilePic";
 
-	//ORGANIZATION
+	// ORGANIZATION
 	private static final int GET_ORGANIZATIONS_REQ = 9;
 	// columns
 	private static final String ORG_ID = "organizationID";
@@ -80,20 +56,21 @@ public class ProjectResourceServlet extends HttpServlet {
 	private static final String ORG_EMAIL = "email";
 	private static final String ORG_PASSWORD = "password";
 	private static final String ORG_ORGPIC = "orgPic";
-	
-	//VOLEVENT
+	private static final int UPDATE_ORG_REQ = 12;
+
+	// VOLEVENT
 	private static final int GET_VOLEVENTS_REQ = 10;
 
 	// columns
 	private static final String VOLEVENT_ID = "eventID";
 	private static final String VOLEVENT_VOLUNTEERID = "volunteerID";
 	private static final String VOLEVENT_ORGANIZATIONID = "organizationID";
-	private static final String VOLEVENTG_DATE  = "date";
+	private static final String VOLEVENTG_DATE = "date";
 	private static final String VOLEVENT_STARTTIME = "startTime";
 	private static final String VOLEVENT_ENDTIME = "endTime";
 	private static final String VOLEVENTG_DETAILS = "details";
 	private static final String VOLEVENTG_TITLE = "title";
-	
+
 	private static final String FOLDER_ID = "f_id";
 	private static final String FOLDER_TITLE = "f_title";
 
@@ -104,10 +81,10 @@ public class ProjectResourceServlet extends HttpServlet {
 	private static final String ITEM_TITLE = "it_title";
 	private static final String ITEM_DESCRIPTION = "it_desc";
 	private static final String ITEM_FOLDER_ID = "it_fid";
-	private static final String FILE_NAME ="name";
+	private static final String FILE_NAME = "name";
 
 	/**
-	 * STATISTICS, screen object 
+	 * STATISTICS, screen object
 	 */
 	private static final int GET_SCREENTIME_REQ = 11;
 	private static final String SCREEN_TIME_ID = "ID";
@@ -115,13 +92,12 @@ public class ProjectResourceServlet extends HttpServlet {
 	private static final String SCREEN_ID = "screenID";
 	private static final String SCREEN_DATE = "date";
 	private static final String SCREEN_DURATION = "duration";
-	
-	
-	
+
+	private static final int UPDATE_SCREEN_REQ = 16;
+
 	private static final String REQ = "req";
 
 	public static final int DB_RETRY_TIMES = 5;
-
 
 	public void init(ServletConfig config) throws ServletException {
 
@@ -157,70 +133,12 @@ public class ProjectResourceServlet extends HttpServlet {
 
 					switch (reqNo) {
 
-					// == item apis
-					case INSERT_ITEM_REQ: {
-						String id = req.getParameter(ITEM_ID);
-
-						String title = req.getParameter(ITEM_TITLE);
-
-						String descrpition = req.getParameter(ITEM_DESCRIPTION);
-
-						String folderId = req.getParameter(ITEM_FOLDER_ID);
-
-						ServletInputStream isServ = req.getInputStream();
-
-						DataInputStream is = new DataInputStream(isServ);
-
-						ByteArrayOutputStream bin = new ByteArrayOutputStream(
-								2048);
-						int data;
-						while ((data = is.read()) != -1) {
-							bin.write((byte) data);
-						}
-
-						byte[] imageBlob = bin.toByteArray();
-
-						respPage = RESOURCE_FAIL_TAG;
-						resp.addHeader("Content-Type",
-								"application/json; charset=UTF-8");
-						conn = ConnPool.getInstance().getConnection();
-						ItemsResProvider itemsResProvider = new ItemsResProvider();
-
-						Item item = new Item(id, title, descrpition, imageBlob,
-								folderId);
-						if (itemsResProvider.insertItem(item, conn)) {
-							respPage = RESOURCE_SUCCESS_TAG;
-						}
-						PrintWriter pw = resp.getWriter();
-						pw.write(respPage);
-
-						retry = 0;
-						break;
-					}
-
-					case DELETE_ITEM_REQ: {
-						String id = req.getParameter(ITEM_ID);
-						respPage = RESOURCE_FAIL_TAG;
-						resp.addHeader("Content-Type",
-								"application/json; charset=UTF-8");
-						conn = ConnPool.getInstance().getConnection();
-						ItemsResProvider itemsResProvider = new ItemsResProvider();
-						Item item = new Item(id);
-						if (itemsResProvider.deleteItem(item, conn)) {
-							respPage = RESOURCE_SUCCESS_TAG;
-						}
-						PrintWriter pw = resp.getWriter();
-						pw.write(respPage);
-
-						retry = 0;
-						break;
-					}
-					
 					case GET_VOLUNTEERS_REQ: {
-					
+
 						conn = ConnPool.getInstance().getConnection();
 						VolunteerResProvider v_provider = new VolunteerResProvider();
-						List<Volunteer> v_list = v_provider.getAllVolunteers(conn);
+						List<Volunteer> v_list = v_provider
+								.getAllVolunteers(conn);
 						String resultJson = Volunteer.toJson(v_list);
 
 						if (resultJson != null && !resultJson.isEmpty()) {
@@ -232,14 +150,13 @@ public class ProjectResourceServlet extends HttpServlet {
 						} else {
 							resp.sendError(404);
 						}
-						
 
 						retry = 0;
 						break;
 					}
-					
+
 					case GET_VOLEVENTS_REQ: {
-						
+
 						conn = ConnPool.getInstance().getConnection();
 						VolEventResProvider v_provider = new VolEventResProvider();
 						List<VolEvent> v_list = v_provider.getAllVolEvent(conn);
@@ -254,17 +171,18 @@ public class ProjectResourceServlet extends HttpServlet {
 						} else {
 							resp.sendError(404);
 						}
-						
+
 						retry = 0;
 						break;
 					}
 					case GET_SCREENTIME_REQ: {
 						String userID = req.getParameter("userId");
-						
+
 						conn = ConnPool.getInstance().getConnection();
 						ScreenTimeResProvider screenProvider = new ScreenTimeResProvider();
 						int user = Integer.parseInt(userID);
-						List<ScreenTime> v_list = screenProvider.getUserScreenTime(user, conn);
+						List<ScreenTime> v_list = screenProvider
+								.getUserScreenTime(user, conn);
 						String resultJson = ScreenTime.toJson(v_list);
 
 						if (resultJson != null && !resultJson.isEmpty()) {
@@ -276,16 +194,16 @@ public class ProjectResourceServlet extends HttpServlet {
 						} else {
 							resp.sendError(404);
 						}
-						
 
 						retry = 0;
 						break;
 					}
 					case GET_ORGANIZATIONS_REQ: {
-						
+
 						conn = ConnPool.getInstance().getConnection();
 						OrganizationResProvider v_provider = new OrganizationResProvider();
-						List<Organization> v_list = v_provider.getAllOrganizations(conn);
+						List<Organization> v_list = v_provider
+								.getAllOrganizations(conn);
 						String resultJson = Organization.toJson(v_list);
 
 						if (resultJson != null && !resultJson.isEmpty()) {
@@ -297,45 +215,42 @@ public class ProjectResourceServlet extends HttpServlet {
 						} else {
 							resp.sendError(404);
 						}
-						
 
 						retry = 0;
 						break;
 					}
-					case UPDATE_ORG_REQ : {
-						
+					case UPDATE_ORG_REQ: {
+
 						respPage = RESOURCE_FAIL_TAG;
 						resp.addHeader("Content-Type",
 								"application/json; charset=UTF-8");
-						
+
 						conn = ConnPool.getInstance().getConnection();
-						
+
 						Organization org = new Organization();
-						
+
 						OrganizationResProvider orgProvider = new OrganizationResProvider();
-						
-						String data  = req.getParameter("data");	
-						
+
+						String data = req.getParameter("data");
+
 						JSONTokener jsonTokener = new JSONTokener(data);
 
-			            JSONObject json = (JSONObject) jsonTokener.nextValue();
-			            
-											
-						if(org.fromJson(json)){
-			
-								if (orgProvider.insertOrganization(org, conn)) {
-									respPage = RESOURCE_SUCCESS_TAG;									
-								}							
-						}									
+						JSONObject json = (JSONObject) jsonTokener.nextValue();
+
+						if (org.fromJson(json)) {
+
+							if (orgProvider.insertOrganization(org, conn)) {
+								respPage = RESOURCE_SUCCESS_TAG;
+							}
+						}
 
 						PrintWriter pw = resp.getWriter();
 						pw.write(respPage);
-						
+
 						retry = 0;
 						break;
-						
+
 					}
-					// == end items apis
 
 					default:
 						retry = 0;

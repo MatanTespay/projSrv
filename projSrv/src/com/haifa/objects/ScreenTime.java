@@ -14,6 +14,9 @@ public class ScreenTime {
 	private int userId;	
 	private int screenId;	
 	private String email;
+	private Date date;	
+	private long duration;
+	private String name;
 	
 	public String getEmail() {
 		return email;
@@ -27,9 +30,7 @@ public class ScreenTime {
 	public void setName(String name) {
 		this.name = name;
 	}
-	private Date date;	
-	private int duration;
-	private String name;
+
 	
 	public ScreenTime() {
 		super();
@@ -38,11 +39,11 @@ public class ScreenTime {
 		this(0,  userId,  screenId,  date, duration , name,"");
 	}
 	//ScreenTime(userID, screenID,  Name,  sumDuration)
-	public ScreenTime(int userId, int screenId, Date date, int duration) {
+	public ScreenTime(int userId, int screenId, Date date, long duration) {
 		this(0,  userId,  screenId,  date, duration , "","");
 	}
 	public ScreenTime(int id, int userId, int screenId, Date date,
-			int duration, String name, String email) {
+			long duration, String name, String email) {
 		super();
 		Id = id;
 		this.userId = userId;
@@ -76,10 +77,10 @@ public class ScreenTime {
 	public void setDate(Date date) {
 		this.date = date;
 	}
-	public int getDuration() {
+	public long getDuration() {
 		return duration;
 	}
-	public void setDuration(int duration) {
+	public void setDuration(long duration) {
 		this.duration = duration;
 	}
 	/**
@@ -133,7 +134,27 @@ public class ScreenTime {
 				iObj.put("Duration", getDuration() );
 				iObj.put("Name", getName() );
 				return iObj;
-			}
+		}
+			
+		public boolean fromJson(JSONObject json) {
+			// TODO Auto-generated method stub
+			boolean res = false;
+
+            try {
+            	
+            	setId(json.getInt("ID"));
+    			setScreenId(json.getInt("screenID") );
+    			setUserId(json.getInt("userID"));
+    			setDate(FilesUtils.getDateTimeFromString(json.getString("date"))); 
+    			setDuration(json.getLong("duration"));
+                
+                res = true;
+            } catch (Throwable t) {
+                t.printStackTrace();
+            }
+            
+            return res;
+		}
 
 	
 }

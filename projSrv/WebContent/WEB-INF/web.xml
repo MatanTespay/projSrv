@@ -85,6 +85,16 @@
 		<url-pattern>/web_volevent_manage</url-pattern>
 	</servlet-mapping>
 	
+	<servlet>
+		<description></description>
+		<display-name>WebScreenManageServlet</display-name>
+		<servlet-name>WebScreenManageServlet</servlet-name>
+		<servlet-class>com.haifa.servlets.WebScreenManageServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>WebScreenManageServlet</servlet-name>
+		<url-pattern>/web_screen_servlet</url-pattern>
+	</servlet-mapping>
 
 
 </web-app>

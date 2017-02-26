@@ -139,7 +139,8 @@ public class VolEventResProvider {
 			// get the volunteer in db that the id is vol.getID
 			stt = (PreparedStatement) conn.prepareStatement(selectByVolAndOrg_sql);
 			stt.setInt(1, volId);			
-			stt.setInt(2, orgId);	
+			stt.setInt(2, orgId);
+			
 			if (stt.execute()) {
 				rs1 = stt.getResultSet();
 				
@@ -173,8 +174,8 @@ public class VolEventResProvider {
 					//			Date startTime = rs.getTimestamp("startTime");
 					//Date endTime = rs.getTimestamp("endTime");
 					ps.setDate(3,FilesUtils. toSqlDate(date));
-					ps.setDate(4,  FilesUtils. toSqlDate(startTime));
-					ps.setDate(5, FilesUtils. toSqlDate(endTime));
+					ps.setString(4,  FilesUtils. getLongDateString(startTime));
+					ps.setString(5, FilesUtils. getLongDateString(endTime));
 					ps.setString(6, details);
 					ps.setString(7, title);
 					
